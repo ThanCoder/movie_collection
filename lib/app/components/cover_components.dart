@@ -68,7 +68,13 @@ class _CoverComponentsState extends State<CoverComponents> {
                 mimeTypes: ['image']),
           ]);
 
-      if (resFile == null) return;
+      if (resFile == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+      ;
       final path = resFile.path;
       final file = File(path);
       await file.copy(widget.coverPath);

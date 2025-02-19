@@ -15,65 +15,72 @@ class MovieHeaderComponent extends StatelessWidget {
       spacing: 10,
       children: [
         SizedBox(
-          width: 150,
-          height: 170,
+          width: 140,
+          height: 160,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child:
                 MyImageFile(path: getMovieCoverSourcePath(movieId: movie.id)),
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.title),
-                Text(movie.title),
-              ],
-            ),
-            movie.genres.isNotEmpty
-                ? Row(
-                    spacing: 10,
-                    children: [
-                      Icon(Icons.generating_tokens_sharp),
-                      Text(movie.genres),
-                    ],
-                  )
-                : Container(),
-            Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.timelapse),
-                Text(getParseMinutes(movie.durationInMinutes)),
-              ],
-            ),
-            Row(
-              spacing: 10,
-              children: [
-                Icon(
-                  Icons.star_border,
-                  color: Colors.yellow,
-                ),
-                Text(movie.imdb.toString()),
-              ],
-            ),
-            Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.date_range_outlined),
-                Text(movie.year.toString()),
-              ],
-            ),
-            Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.date_range),
-                Text(getParseDate(movie.date)),
-              ],
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                spacing: 10,
+                children: [
+                  Icon(Icons.title),
+                  Expanded(
+                    child: Text(
+                      movie.title,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              movie.genres.isNotEmpty
+                  ? Row(
+                      spacing: 10,
+                      children: [
+                        Icon(Icons.generating_tokens_sharp),
+                        Expanded(child: Text(movie.genres)),
+                      ],
+                    )
+                  : Container(),
+              Row(
+                spacing: 10,
+                children: [
+                  Icon(Icons.timelapse),
+                  Text(getParseMinutes(movie.durationInMinutes)),
+                ],
+              ),
+              Row(
+                spacing: 10,
+                children: [
+                  Icon(
+                    Icons.star_border,
+                    color: Colors.yellow,
+                  ),
+                  Text(movie.imdb.toString()),
+                ],
+              ),
+              Row(
+                spacing: 10,
+                children: [
+                  Icon(Icons.date_range_outlined),
+                  Text(movie.year.toString()),
+                ],
+              ),
+              Row(
+                spacing: 10,
+                children: [
+                  Icon(Icons.date_range),
+                  Expanded(child: Text(getParseDate(movie.date))),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );

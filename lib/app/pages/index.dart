@@ -1,0 +1,10 @@
+export './genres_page.dart';
+export './home_more_page.dart';
+export './home_page.dart';
+export './library_page.dart';
+export './movie_form_home_page.dart';
+export './movie_form_video_page.dart';
+export './series_home_page.dart';
+export './series_movie_content_page.dart';
+export './single_movie_content_page.dart';
+export './video_list_page.dart';

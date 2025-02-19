@@ -20,7 +20,10 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
-      body: Text('genres'),
+      appBar: AppBar(
+        title: Text('Library'),
+      ),
+      body: Placeholder(),
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/constants.dart';
 
+import '../constants.dart';
 class MyImageUrl extends StatelessWidget {
   String url;
   String defaultAssetsPath;

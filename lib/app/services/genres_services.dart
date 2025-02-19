@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/constants.dart';
-import 'package:movie_collections/app/models/genres_model.dart';
-import 'package:movie_collections/app/utils/path_util.dart';
+
+import '../constants.dart';
+import '../models/genres_model.dart';
+import '../utils/path_util.dart';
+
 
 Future<List<GenresModel>> getGenresList() async {
   List<GenresModel> list = [];

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/constants.dart';
-import 'package:movie_collections/app/notifiers/app_notifier.dart';
-import 'package:movie_collections/app/services/app_path_services.dart';
+
+import '../constants.dart';
+import '../notifiers/app_notifier.dart';
 
 String getBasename(String path) {
   return path.split('/').last;
@@ -30,11 +30,8 @@ String getDatabaseSourcePath() {
 }
 
 String getCachePath() {
-  if (Platform.isAndroid) {
-    return createDir('${appDataRootPathNotifier.value}/cache');
-  } else {
-    return createDir('${getHomePath()}/cache');
-  }
+  String homeDir = createDir('${appConfigPathNotifier.value}/$appName');
+  return createDir('$homeDir/cache');
 }
 
 String getSourcePath() {
@@ -42,11 +39,8 @@ String getSourcePath() {
 }
 
 String getOutPath() {
-  if (Platform.isLinux) {
-    String download = createDir('${getAppExternalRootPath()}/Downloads');
-    return createDir('$download/${appName}_out');
-  }
-  return createDir('${getAppExternalRootPath()}/${appName}_out');
+  String download = createDir('${appExternalPathNotifier.value}/Downloads');
+  return createDir('$download/${appName}_out');
 }
 
 String createDir(String path) {

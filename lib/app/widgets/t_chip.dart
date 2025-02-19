@@ -15,13 +15,16 @@ class TChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onClick,
-      child: Chip(
-        deleteIconColor: Colors.red[900],
-        label: Text(title),
-        avatar: avatar,
-        onDeleted: onDelete,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onClick,
+        child: Chip(
+          deleteIconColor: Colors.red[900],
+          label: Text(title),
+          avatar: avatar,
+          onDeleted: onDelete,
+        ),
       ),
     );
   }

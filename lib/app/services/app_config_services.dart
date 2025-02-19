@@ -2,41 +2,45 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/constants.dart';
-import 'package:movie_collections/app/models/app_config_model.dart';
-import 'package:movie_collections/app/notifiers/app_notifier.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:than_pkg/than_pkg.dart';
+import '../constants.dart';
+import '../models/app_config_model.dart';
+import '../notifiers/app_notifier.dart';
 
-Future<void> initConfig() async {
+Future<void> initAppConfigService() async {
   try {
-    if (Platform.isLinux) {
-      appRootPathNotifier.value = '${Directory.current.path}/.$appName';
-    } else if (Platform.isAndroid) {
-      final dir = await getExternalStorageDirectory();
-      appRootPathNotifier.value = dir!.path;
-      appDataRootPathNotifier.value = dir.path;
+    final rootPath = await ThanPkg.platform.getAppRootPath();
+    final externalPath = await ThanPkg.platform.getAppExternalPath();
+    //set
+    if (rootPath != null) {
+      appRootPathNotifier.value = '$rootPath/.$appName';
+      appConfigPathNotifier.value = '$rootPath/.$appName';
     }
-    appConfigPathNotifier.value =
-        '${appRootPathNotifier.value}/$appConfigFileName';
-    //config
-    await initAppConfig();
+    if (externalPath != null) {
+      appExternalPathNotifier.value = externalPath;
+    }
+    await _initAppConfig();
   } catch (e) {
     debugPrint('initConfig: ${e.toString()}');
   }
 }
 
-Future<void> initAppConfig() async {
-  final config = getConfigFile();
-  appConfigNotifier.value = config;
-  //custom path
-  if (config.isUseCustomPath && config.customPath.isNotEmpty) {
-    appRootPathNotifier.value = config.customPath;
+Future<void> _initAppConfig() async {
+  try {
+    final config = getConfigFile();
+    appConfigNotifier.value = config;
+    //custom path
+    if (config.isUseCustomPath && config.customPath.isNotEmpty) {
+      appRootPathNotifier.value = config.customPath;
+    }
+    isDarkThemeNotifier.value = config.isDarkTheme;
+  } catch (e) {
+    debugPrint('_initAppConfig: ${e.toString()}');
   }
-  isDarkThemeNotifier.value = config.isDarkTheme;
 }
 
 AppConfigModel getConfigFile() {
-  final file = File(appConfigPathNotifier.value);
+  final file = File('${appConfigPathNotifier.value}/$appConfigFileName');
   if (!file.existsSync()) {
     return AppConfigModel();
   }
@@ -44,7 +48,8 @@ AppConfigModel getConfigFile() {
 }
 
 void setConfigFile(AppConfigModel appConfig) {
-  final file = File(appConfigPathNotifier.value);
+  final file = File('${appConfigPathNotifier.value}/$appConfigFileName');
   String data = const JsonEncoder.withIndent('  ').convert(appConfig.toJson());
   file.writeAsStringSync(data);
+  appConfigNotifier.value = appConfig;
 }

@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:movie_collections/app/components/app_components.dart';
-import 'package:movie_collections/app/components/cover_components.dart';
-import 'package:movie_collections/app/components/genres_component.dart';
-import 'package:movie_collections/app/components/imdb_component.dart';
-import 'package:movie_collections/app/components/movie_delete_action_components.dart';
-import 'package:movie_collections/app/components/year_component.dart';
+import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/notifiers/movie_notifier.dart';
 import 'package:movie_collections/app/providers/movie_provider.dart';
 import 'package:movie_collections/app/services/movie_services.dart';
-import 'package:movie_collections/app/widgets/my_scaffold.dart';
-import 'package:movie_collections/app/widgets/t_text_field.dart';
+import 'package:movie_collections/app/widgets/index.dart';
 import 'package:provider/provider.dart';
 
 class MovieFormHomePage extends StatefulWidget {

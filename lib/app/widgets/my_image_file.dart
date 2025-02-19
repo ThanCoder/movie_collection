@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/constants.dart';
+
+import '../constants.dart';
 
 class MyImageFile extends StatelessWidget {
   String path;

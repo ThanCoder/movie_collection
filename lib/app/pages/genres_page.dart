@@ -6,6 +6,7 @@ import 'package:movie_collections/app/notifiers/movie_notifier.dart';
 import 'package:movie_collections/app/providers/genres_provider.dart';
 import 'package:movie_collections/app/providers/movie_provider.dart';
 import 'package:movie_collections/app/screens/movie_content_screen.dart';
+import 'package:movie_collections/app/widgets/my_scaffold.dart';
 import 'package:movie_collections/app/widgets/t_chip.dart';
 import 'package:provider/provider.dart';
 
@@ -20,17 +21,15 @@ class _GenresPageState extends State<GenresPage> {
   @override
   void initState() {
     super.initState();
-    init();
+    WidgetsBinding.instance.addPostFrameCallback((_) => init());
   }
 
   String currentGenresTitle = 'All';
   List<MovieModel> sortedMovies = [];
 
   void init() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GenresProvider>(context, listen: false).initList();
-      _sortMovie();
-    });
+    context.read<GenresProvider>().initList();
+    _sortMovie();
   }
 
   void _sortMovie() {
@@ -69,41 +68,46 @@ class _GenresPageState extends State<GenresPage> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<GenresProvider>();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            TChip(
-              avatar: currentGenresTitle == 'All' ? Icon(Icons.check) : null,
-              title: 'All',
-              onClick: () {
-                setState(() {
-                  currentGenresTitle = 'All';
-                });
-                _sortMovie();
+    return MyScaffold(
+      appBar: AppBar(
+        title: Text('Genres'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              TChip(
+                avatar: currentGenresTitle == 'All' ? Icon(Icons.check) : null,
+                title: 'All',
+                onClick: () {
+                  setState(() {
+                    currentGenresTitle = 'All';
+                  });
+                  _sortMovie();
+                },
+              ),
+              ..._getGenresWidgets(provider.getList)
+            ],
+          ),
+          Expanded(
+            child: MovieListView(
+              movieList: sortedMovies,
+              onClick: (movie) {
+                currentMovieNotifier.value = movie;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MovieContentScreen(),
+                  ),
+                );
               },
             ),
-            ..._getGenresWidgets(provider.getList)
-          ],
-        ),
-        Expanded(
-          child: MovieListView(
-            movieList: sortedMovies,
-            onClick: (movie) {
-              currentMovieNotifier.value = movie;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MovieContentScreen(),
-                ),
-              );
-            },
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }

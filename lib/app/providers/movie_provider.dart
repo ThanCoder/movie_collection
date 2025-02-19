@@ -164,7 +164,9 @@ class MovieProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      debugPrint(e.toString());
+      _isLoading = false;
+      notifyListeners();
+      debugPrint('addMultipleMovieFromDirPath: ${e.toString()}');
     }
   }
 
@@ -242,7 +244,9 @@ class MovieProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      debugPrint(e.toString());
+      _isLoading = false;
+      notifyListeners();
+      debugPrint('addMultipleMovieFromPath: ${e.toString()}');
     }
   }
 
