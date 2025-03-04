@@ -5,11 +5,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:label="movie_collections"
+        android:label="flutter_boilerplate"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon"
-        android:enableOnBackInvokedCallback="true"
-        >
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"

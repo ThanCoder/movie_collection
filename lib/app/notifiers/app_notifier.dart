@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/app_config_model.dart';
+import '../models/core/app_config_model.dart';
 //path
 ValueNotifier<String> appRootPathNotifier = ValueNotifier('');
 ValueNotifier<String> appExternalPathNotifier = ValueNotifier('');

@@ -8,7 +8,7 @@ part of 'movie_model.dart';
 
 class MovieModelAdapter extends TypeAdapter<MovieModel> {
   @override
-  final int typeId = 1;
+  final int typeId = 0;
 
   @override
   MovieModel read(BinaryReader reader) {
@@ -19,42 +19,34 @@ class MovieModelAdapter extends TypeAdapter<MovieModel> {
     return MovieModel(
       id: fields[0] as String,
       title: fields[1] as String,
-      year: fields[9] as int,
-      isMultipleMovie: fields[8] == null ? false : fields[8] as bool,
-      genres: fields[2] as String,
-      description: fields[3] == null ? '' : fields[3] as String,
-      durationInMinutes: fields[5] as int,
-      imdb: fields[4] == null ? 1.0 : fields[4] as double,
-      posterUrl: fields[6] == null ? '' : fields[6] as String,
-      trailerUrl: fields[7] == null ? '' : fields[7] as String,
-    )..date = fields[10] as int;
+      path: fields[5] as String,
+      content: fields[2] as String,
+      tags: fields[6] as String,
+      type: fields[3] as String,
+      infoType: fields[4] as String,
+      date: fields[7] as int,
+    );
   }
 
   @override
   void write(BinaryWriter writer, MovieModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.genres)
+      ..write(obj.content)
       ..writeByte(3)
-      ..write(obj.description)
+      ..write(obj.type)
       ..writeByte(4)
-      ..write(obj.imdb)
+      ..write(obj.infoType)
       ..writeByte(5)
-      ..write(obj.durationInMinutes)
+      ..write(obj.path)
       ..writeByte(6)
-      ..write(obj.posterUrl)
+      ..write(obj.tags)
       ..writeByte(7)
-      ..write(obj.trailerUrl)
-      ..writeByte(8)
-      ..write(obj.isMultipleMovie)
-      ..writeByte(9)
-      ..write(obj.year)
-      ..writeByte(10)
       ..write(obj.date);
   }
 

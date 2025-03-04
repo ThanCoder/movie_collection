@@ -1,13 +1,5 @@
-export './add_movie_form_path_chooser_component.dart';
-export './add_movie_from_path_btn_component.dart';
-export './app_components.dart';
-export './cover_components.dart';
-export './genres_component.dart';
-export './imdb_component.dart';
-export './movie_content_menu_action_component.dart';
-export './movie_delete_action_components.dart';
-export './movie_header_component.dart';
-export './movie_list_view.dart';
-export './video_grid_view.dart';
-export './video_list_view.dart';
-export './year_component.dart';
+export 'core/index.dart';
+
+export 'movie_add_action_button.dart';
+export 'movie_info_type_chooser.dart';
+export 'movie_type_chooser.dart';

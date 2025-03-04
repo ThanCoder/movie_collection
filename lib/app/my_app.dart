@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/notifiers/app_notifier.dart';
-import 'package:movie_collections/app/screens/home_screen.dart';
+
+import 'notifiers/app_notifier.dart';
+import 'screens/index.dart';
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -1,13 +1,15 @@
-import 'package:cherry_toast/cherry_toast.dart';
-import 'package:flutter/material.dart';
-import 'package:movie_collections/app/constants.dart';
-import 'package:movie_collections/app/providers/index.dart';
-import 'package:provider/provider.dart';
-import 'package:than_pkg/than_pkg.dart';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:movie_collections/app/utils/index.dart';
+
+import '../extensions/index.dart';
+import '../components/index.dart';
+import '../constants.dart';
+import '../dialogs/core/index.dart';
 import '../models/index.dart';
 import '../notifiers/app_notifier.dart';
-import '../services/index.dart';
+import '../services/core/index.dart';
 import '../widgets/index.dart';
 
 class AppSettingScreen extends StatefulWidget {
@@ -18,93 +20,144 @@ class AppSettingScreen extends StatefulWidget {
 }
 
 class _AppSettingScreenState extends State<AppSettingScreen> {
-  late AppConfigModel config;
-  final TextEditingController customPathController = TextEditingController();
-
   @override
   void initState() {
-    config = appConfigNotifier.value;
-    super.initState();
     init();
+    super.initState();
   }
 
-  void init() {
-    if (config.customPath.isEmpty) {
-      customPathController.text = '${appExternalPathNotifier.value}/.$appName';
-    } else {
-      customPathController.text = config.customPath;
-    }
+  bool isChanged = false;
+  bool isCustomPathTextControllerTextSelected = false;
+  late AppConfigModel config;
+  TextEditingController customPathTextController = TextEditingController();
+
+  void init() async {
+    customPathTextController.text = '${getAppExternalRootPath()}/.$appName';
+    config = appConfigNotifier.value;
   }
 
-  void _save() async {
-    //check permission
-    if (config.isUseCustomPath) {
-      final isGranted = await ThanPkg.platform.isStoragePermissionGranted();
-      if (!isGranted) {
-        await ThanPkg.platform.requestStoragePermission();
-        return;
+  void _saveConfig() async {
+    try {
+      if (Platform.isAndroid && config.isUseCustomPath) {
+        if (!await checkStoragePermission()) {
+          if (mounted) {
+            showConfirmStoragePermissionDialog(context);
+          }
+          return;
+        }
       }
+      //set custom path
+      config.customPath = customPathTextController.text;
+
+      //save
+      setConfigFile(config);
+      appConfigNotifier.value = config;
+      if (config.isUseCustomPath) {
+        //change
+        appRootPathNotifier.value = config.customPath;
+        //change hive path
+        await changeHiveDatabasePath();
+      }
+      //init config
+      await initAppConfigService();
+      //init
+
+      if (!mounted) return;
+      showMessage(context, 'Config ကိုသိမ်းဆည်းပြီးပါပြီ');
+      setState(() {
+        isChanged = false;
+      });
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('saveConfig: ${e.toString()}');
     }
-    config.customPath = customPathController.text;
-    setConfigFile(config);
-    await initAppConfigService();
-    //provider
+  }
 
-    if (!mounted) return;
+  void _onBackpress() {
+    if (!isChanged) {
+      return;
+    }
 
-    await context.read<MovieProvider>().initList();
-
-    if (!mounted) return;
-
-    CherryToast.success(
-      title: Text('Setting Saved'),
-      inheritThemeColors: true,
-    ).show(context);
-    Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        contentText: 'setting ကိုသိမ်းဆည်းထားချင်ပါသလား?',
+        cancelText: 'မသိမ်းဘူး',
+        submitText: 'သိမ်းမယ်',
+        onCancel: () {
+          isChanged = false;
+          Navigator.pop(context);
+        },
+        onSubmit: () {
+          _saveConfig();
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MyScaffold(
-      appBar: AppBar(
-        title: Text('Setting'),
-        actions: [
-          IconButton(
-            onPressed: _save,
-            icon: Icon(Icons.save_as_rounded),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+    return PopScope(
+      canPop: !isChanged,
+      onPopInvokedWithResult: (didPop, result) {
+        _onBackpress();
+      },
+      child: MyScaffold(
+        appBar: AppBar(
+          title: const Text('Setting'),
+        ),
+        body: ListView(
           children: [
             //custom path
             ListTileWithDesc(
-              title: 'Custom Path',
-              desc: 'ကြိုက်နှစ်သက်ရာ path',
+              title: "custom path",
+              desc: "သင်ကြိုက်နှစ်သက်တဲ့ path ကို ထည့်ပေးပါ",
               trailing: Checkbox(
                 value: config.isUseCustomPath,
                 onChanged: (value) {
                   setState(() {
                     config.isUseCustomPath = value!;
+                    isChanged = true;
                   });
                 },
               ),
             ),
-            //custom path
             config.isUseCustomPath
-                ? Card(
-                    child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TTextField(
-                      hintText: 'Custom Path',
-                      label: Text('Custom Path'),
-                      controller: customPathController,
+                ? ListTileWithDescWidget(
+                    widget1: TextField(
+                      controller: customPathTextController,
+                      onTap: () {
+                        if (!isCustomPathTextControllerTextSelected) {
+                          customPathTextController.selectAll();
+                          isCustomPathTextControllerTextSelected = true;
+                        }
+                      },
+                      onTapOutside: (event) {
+                        isCustomPathTextControllerTextSelected = false;
+                      },
                     ),
-                  ))
-                : Container()
+                    widget2: IconButton(
+                      onPressed: () {
+                        _saveConfig();
+                      },
+                      icon: const Icon(
+                        Icons.save,
+                      ),
+                    ),
+                  )
+                : Container(),
+
+            //
           ],
         ),
+        floatingActionButton: isChanged
+            ? FloatingActionButton(
+                onPressed: () {
+                  _saveConfig();
+                },
+                child: const Icon(Icons.save),
+              )
+            : null,
       ),
     );
   }

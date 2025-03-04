@@ -1,3 +1,3 @@
-export './confirm_dialog.dart';
-export './genres_form_dialog.dart';
-export './rename_dialog.dart';
+export './core/index.dart';
+
+export 'movie_type_chooser_dialog.dart';
