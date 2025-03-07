@@ -14,6 +14,7 @@ class AllMovieScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
+      contentPadding: 2,
       appBar: AppBar(
         title: Text(title),
       ),

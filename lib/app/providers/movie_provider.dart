@@ -223,12 +223,29 @@ class MovieProvider with ChangeNotifier {
 
       _list.addAll(res);
       // print(_list.map((vd) => vd.id).toSet());
+      //not exists cover file
+      final noExistsCover = _list.where((vd) {
+        final file = File(vd.coverPath);
+        return !file.existsSync();
+      }).toList();
 
       //cover gen
       await ThanPkg.platform.genVideoCover(
         outDirPath: cachePath,
-        videoPathList: _list.map((mv) => mv.path).toList(),
+        videoPathList: noExistsCover.map((vd) => vd.path).toList(),
       );
+      final dbSourcePath = PathUtil.instance.getDatabaseSourcePath();
+      //copy file
+      for (var vd in noExistsCover) {
+        final coverFile = File('$dbSourcePath/${vd.id}/cover.png');
+        final cacheCoverFile = File('$cachePath/${vd.path.getName()}.png');
+        if (!await cacheCoverFile.exists() || await coverFile.exists()) {
+          continue;
+        }
+        print(cacheCoverFile.path);
+        //ရှိနေရင်
+        await cacheCoverFile.copy(coverFile.path);
+      }
 
       _isLoading = false;
       notifyListeners();
