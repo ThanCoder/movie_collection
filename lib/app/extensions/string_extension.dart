@@ -6,12 +6,14 @@ extension StringExtension on String {
 
   String getName({bool withExt = true}) {
     var name = split('/').last;
-    if (withExt) {}
+    if (withExt) {
+      return name;
+    }
     //replace . ပါလာရင်
     String ext = name.split('.').last;
     final noExt = name.replaceAll('.$ext', '');
-    name = '${noExt.replaceAll('.', ' ')}.$ext';
-    return name;
+    // name = '${name.replaceAll('.', ' ')}.$ext';
+    return noExt;
   }
 
   String getExt() {

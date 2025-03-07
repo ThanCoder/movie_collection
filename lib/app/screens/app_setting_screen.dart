@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/utils/index.dart';
+import 'package:flutter/services.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../extensions/index.dart';
 import '../components/index.dart';
@@ -27,6 +29,8 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
   }
 
   bool isChanged = false;
+  bool appIsExists = false;
+  bool oldIsUsedCustomPath = false;
   bool isCustomPathTextControllerTextSelected = false;
   late AppConfigModel config;
   TextEditingController customPathTextController = TextEditingController();
@@ -34,6 +38,7 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
   void init() async {
     customPathTextController.text = '${getAppExternalRootPath()}/.$appName';
     config = appConfigNotifier.value;
+    oldIsUsedCustomPath = config.isUseCustomPath;
   }
 
   void _saveConfig() async {
@@ -49,15 +54,20 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
       //set custom path
       config.customPath = customPathTextController.text;
 
+      if (config.isUseCustomPath != oldIsUsedCustomPath) {
+        appIsExists = true;
+      } else {
+        appIsExists = false;
+      }
+
       //save
       setConfigFile(config);
       appConfigNotifier.value = config;
       if (config.isUseCustomPath) {
         //change
         appRootPathNotifier.value = config.customPath;
-        //change hive path
-        await changeHiveDatabasePath();
       }
+
       //init config
       await initAppConfigService();
       //init
@@ -68,8 +78,22 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
         isChanged = false;
       });
       Navigator.pop(context);
+      _existsApp();
     } catch (e) {
       debugPrint('saveConfig: ${e.toString()}');
+    }
+  }
+
+  void _existsApp() {
+    if (!appIsExists) return;
+    showMessage(context, 'Database Path ပြောင်းလဲလိုက်ပါပြီ');
+    debugPrint('production mode: app exists');
+    if (kDebugMode) return;
+    if (Platform.isLinux) {
+      windowManager.close();
+    }
+    if (Platform.isAndroid) {
+      SystemNavigator.pop();
     }
   }
 

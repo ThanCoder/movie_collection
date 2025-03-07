@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
+import 'package:movie_collections/app/extensions/string_extension.dart';
 
 class MovieTypeChooserDialog extends StatefulWidget {
   void Function(MovieTypes movieType, MovieInfoTypes movieInfoType) onSubmited;
@@ -21,6 +22,7 @@ class _MovieTypeChooserDialogState extends State<MovieTypeChooserDialog> {
       content: SingleChildScrollView(
         child: Column(
           spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               spacing: 5,
@@ -50,10 +52,21 @@ class _MovieTypeChooserDialogState extends State<MovieTypeChooserDialog> {
                 ),
               ],
             ),
+            Text(
+                '${MovieInfoTypes.info.name.toCaptalize()} -> movie file အချက်အလက်ပဲ ရယူမယ်'),
+            Text(
+                '${MovieInfoTypes.data.name.toCaptalize()} -> movie file ကိုပါ ရွှေ့မယ်'),
+            // Text('info -> movie file '),
           ],
         ),
       ),
       actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Cancel'),
+        ),
         TextButton(
           onPressed: () {
             Navigator.pop(context);

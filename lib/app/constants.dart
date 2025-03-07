@@ -7,8 +7,8 @@ const isDebugPrint = false;
 const defaultIconAssetsPath = 'assets/logo.webp';
 //version name
 const appVersionName = 'beta-test-1';
-const appName = 'bolierplate';
-const appTitle = 'Bolierplate App';
+const appName = 'movie_collections';
+const appTitle = 'Movie Collections';
 const androidRootPath = "/storage/emulated/0";
 //config
 const appConfigFileName = 'main.config.json';

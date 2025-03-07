@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/enums/movie_info_types.dart';
+import 'package:movie_collections/app/extensions/string_extension.dart';
 
 class MovieInfoTypeChooser extends StatelessWidget {
   MovieInfoTypes type;
+
   void Function(MovieInfoTypes type) onChoosed;
   MovieInfoTypeChooser({
     super.key,
@@ -20,7 +22,7 @@ class MovieInfoTypeChooser extends StatelessWidget {
           .map(
             (mt) => DropdownMenuItem<MovieInfoTypes>(
               value: mt,
-              child: Text(mt.name),
+              child: Text(mt.name.toCaptalize()),
             ),
           )
           .toList(),

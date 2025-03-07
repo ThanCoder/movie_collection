@@ -7,7 +7,9 @@ import 'package:movie_collections/app/dialogs/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/providers/index.dart';
+import 'package:movie_collections/app/utils/index.dart';
 import 'package:provider/provider.dart';
+import 'package:real_path_file_selector/real_path_file_selector.dart';
 import 'package:uuid/uuid.dart';
 
 class MovieAddActionButton extends StatefulWidget {
@@ -20,15 +22,25 @@ class MovieAddActionButton extends StatefulWidget {
 class _MovieAddActionButtonState extends State<MovieAddActionButton> {
   void _pathSelector() async {
     try {
-      final files = await openFiles(
-        acceptedTypeGroups: [
-          XTypeGroup(extensions: ['.mp4', '.mkv'], mimeTypes: ['video/mp4']),
-        ],
-      );
+      List<String> pathList = [];
 
-      if (files.isEmpty) return;
+      if (Platform.isLinux) {
+        final files = await openFiles(
+          acceptedTypeGroups: [
+            XTypeGroup(extensions: ['.mp4', '.mkv'], mimeTypes: ['video/mp4']),
+          ],
+        );
 
-      List<String> pathList = files.map((f) => f.path).toList();
+        if (files.isEmpty) return;
+        pathList = files.map((f) => f.path).toList();
+      } else if (Platform.isAndroid) {
+        pathList = await RealPathFileSelector.openFileScanner.open(
+          context,
+          mimeType: 'video',
+          title: 'Choose Movie',
+          thumbnailDirPath: PathUtil.instance.getCachePath(),
+        );
+      }
 
       ///choose type
       if (!mounted) return;
@@ -66,11 +78,19 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
           final movie = MovieModel(
             id: Uuid().v4(),
             title: title,
+            path: '',
             date: DateTime.now().millisecondsSinceEpoch,
-            type: MovieTypes.movie.name,
+            type: MovieTypes.series.name,
             infoType: MovieInfoTypes.info.name,
+            size: 0,
           );
           context.read<MovieProvider>().add(movie: movie);
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => MovieFormScreen(),
+          //   ),
+          // );
         },
       ),
     );
@@ -132,14 +152,14 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ListTile(
-                leading: Icon(Icons.add),
-                title: Text('New Movie'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _newMovie();
-                },
-              ),
+              // ListTile(
+              //   leading: Icon(Icons.add),
+              //   title: Text('New Movie'),
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     _newMovie();
+              //   },
+              // ),
               ListTile(
                 leading: Icon(Icons.add),
                 title: Text('Add From Path'),

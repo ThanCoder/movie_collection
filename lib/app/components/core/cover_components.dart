@@ -25,7 +25,6 @@ class _CoverComponentsState extends State<CoverComponents> {
   void initState() {
     imagePath = widget.coverPath;
     super.initState();
-    print('init');
   }
 
   void _downloadUrl() {

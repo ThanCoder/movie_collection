@@ -9,8 +9,8 @@ extension FileSystemEntityExtension on FileSystemEntity {
     //replace . ပါလာရင်
     String ext = name.split('.').last;
     final noExt = name.replaceAll('.$ext', '');
-    name = '${noExt.replaceAll('.', ' ')}.$ext';
-    return name;
+    // name = '${noExt.replaceAll('.', ' ')}.$ext';
+    return noExt;
   }
 
   String getExt() {

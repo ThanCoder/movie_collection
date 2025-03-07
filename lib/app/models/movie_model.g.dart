@@ -19,12 +19,12 @@ class MovieModelAdapter extends TypeAdapter<MovieModel> {
     return MovieModel(
       id: fields[0] as String,
       title: fields[1] as String,
-      path: fields[5] as String,
-      content: fields[2] as String,
-      tags: fields[6] as String,
-      type: fields[3] as String,
-      infoType: fields[4] as String,
-      date: fields[7] as int,
+      path: fields[4] as String,
+      tags: fields[5] as String,
+      type: fields[2] as String,
+      infoType: fields[3] as String,
+      date: fields[6] as int,
+      size: fields[7] == null ? 0 : fields[7] as int,
     );
   }
 
@@ -37,17 +37,17 @@ class MovieModelAdapter extends TypeAdapter<MovieModel> {
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.content)
-      ..writeByte(3)
       ..write(obj.type)
-      ..writeByte(4)
+      ..writeByte(3)
       ..write(obj.infoType)
-      ..writeByte(5)
+      ..writeByte(4)
       ..write(obj.path)
-      ..writeByte(6)
+      ..writeByte(5)
       ..write(obj.tags)
+      ..writeByte(6)
+      ..write(obj.date)
       ..writeByte(7)
-      ..write(obj.date);
+      ..write(obj.size);
   }
 
   @override

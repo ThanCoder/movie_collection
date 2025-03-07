@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/utils/index.dart';
@@ -15,6 +16,8 @@ void main() async {
 
   //init config
   await initAppConfigService();
+  //mdia
+  MediaKit.ensureInitialized();
 
   //hive
   await Hive.initFlutter(PathUtil.instance.getDatabasePath());
@@ -27,6 +30,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MovieProvider()),
+        ChangeNotifierProvider(create: (context) => SeriesProvider()),
       ],
       child: const MyApp(),
     ),
