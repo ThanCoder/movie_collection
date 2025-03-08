@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/extensions/index.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/widgets/core/index.dart';
@@ -89,14 +90,27 @@ class _MovieListItemState extends State<MovieListItem> {
                     children: [
                       Text(
                         widget.movie.title,
+                        maxLines: 2,
                         style: TextStyle(fontSize: 12),
                       ),
-                      Text(widget.movie.type.toCaptalize()),
-                      Text(widget.movie.infoType.toCaptalize()),
+                      //type
+                      Row(
+                        spacing: 5,
+                        children: [
+                          Text('Type: '),
+                          Text(widget.movie.type.toCaptalize()),
+                          SizedBox(width: 10),
+                          Text('InfoType: '),
+                          Text(widget.movie.infoType.toCaptalize()),
+                        ],
+                      ),
+
                       // Text(widget.movie.tags),
                       Text(AppUtil.instance
                           .getParseFileSize(widget.movie.size.toDouble())),
+
                       Text(AppUtil.instance.getParseDate(widget.movie.date)),
+                      MovieBookmarkButton(movie: widget.movie),
                     ],
                   ),
                 ),

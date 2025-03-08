@@ -8,6 +8,7 @@ import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
+import 'package:movie_collections/app/services/index.dart';
 import 'package:movie_collections/app/services/movie_services.dart';
 import 'package:movie_collections/app/widgets/index.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,7 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
     try {
       final provider = context.read<MovieProvider>();
       final movie = provider.getCurrent!;
-      //check resume
+      //check resume music ဆိုရင် resume mode မပေးဘူး
       if (movie.type == MovieTypes.music.name) {
         isResumed = false;
       } else {
@@ -76,14 +77,16 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
         });
       });
       _play();
+      //go item
+      _scrollTo(currentPos, 145);
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
   Future<void> _play() async {
+    final movie = context.read<MovieProvider>().getCurrent!;
     if (isResumed) {
-      final movie = context.read<MovieProvider>().getCurrent!;
       final dur = await MovieServices.instance.getPosition(movie: movie);
       await Future.delayed(Duration(milliseconds: 500));
       if (dur != 0) {
@@ -91,6 +94,7 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
       }
     }
     await player.play();
+    RecentMovieServices.instance.add(movieId: movie.id);
   }
 
   Future<void> _setPosition() async {
@@ -130,6 +134,7 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
               currentPos = index;
             });
             player.jump(currentPos);
+            RecentMovieServices.instance.add(movieId: movie.id);
             _scrollTo(index, itemHeight);
           },
         ),
@@ -185,6 +190,7 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
       child: MyScaffold(
         contentPadding: 0,
         body: CustomScrollView(
+          controller: scrollController,
           slivers: [
             SliverAppBar(
               automaticallyImplyLeading: Platform.isLinux,
@@ -233,7 +239,7 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
                     await player.jump(currentPos);
                     await _play();
 
-                    // _scrollTo(index, itemHeight);
+                    _scrollTo(index, itemHeight);
                   },
                 ),
               ),

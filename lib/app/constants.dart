@@ -13,6 +13,8 @@ const androidRootPath = "/storage/emulated/0";
 //config
 const appConfigFileName = 'main.config.json';
 const appMainDatabaseName = 'main.db.json';
+const appBookmarkDatabaseName = 'bookmark.db.json';
+const appRecentDatabaseName = 'recent.db.json';
 const appGenresDatabaseName = 'genres.db.json';
 
 final activeColor = Colors.teal[600];

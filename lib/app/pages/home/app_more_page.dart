@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:than_pkg/than_pkg.dart';
 
-import '../components/index.dart';
-import '../notifiers/app_notifier.dart';
-import '../screens/index.dart';
-import '../services/index.dart';
+import '../../components/index.dart';
+import '../../notifiers/app_notifier.dart';
+import '../../screens/index.dart';
+import '../../services/index.dart';
 import '/app/widgets/index.dart';
 
 class AppMorePage extends StatelessWidget {

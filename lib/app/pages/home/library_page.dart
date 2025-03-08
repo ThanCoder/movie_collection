@@ -1,0 +1,102 @@
+import 'package:flutter/material.dart';
+import 'package:movie_collections/app/components/movie_see_all_list_view.dart';
+import 'package:movie_collections/app/models/index.dart';
+import 'package:movie_collections/app/providers/index.dart';
+import 'package:movie_collections/app/screens/index.dart';
+import 'package:movie_collections/app/services/index.dart';
+import 'package:movie_collections/app/widgets/index.dart';
+import 'package:provider/provider.dart';
+
+import '../../screens/all_movie_screen.dart';
+
+class LibraryPage extends StatefulWidget {
+  const LibraryPage({super.key});
+
+  @override
+  State<LibraryPage> createState() => _LibraryPageState();
+}
+
+class _LibraryPageState extends State<LibraryPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => init());
+  }
+
+  List<MovieModel> recentList = [];
+  List<MovieModel> bookmarkList = [];
+
+  void init() async {
+    try {
+      final list = await context.read<MovieProvider>().initList();
+      final bookmark = await BookmarkServices.instance.getList();
+      final recent = await RecentMovieServices.instance.getList();
+      bookmarkList = list.where((vd) => bookmark.contains(vd.id)).toList();
+      recentList = list.where((vd) => recent.contains(vd.id)).toList();
+      recentList =
+          recent.map((id) => list.firstWhere((vd) => vd.id == id)).toList();
+
+      setState(() {});
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  void _goContentScreen(MovieModel movie) {
+    context.read<MovieProvider>().setCurrent(movie);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MovieContentScreen(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isLoading = context.watch<MovieProvider>().isLoading;
+    return MyScaffold(
+      appBar: AppBar(
+        title: Text('Library'),
+      ),
+      body: isLoading
+          ? TLoader()
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  //recent
+                  MovieSeeAllListView(
+                    title: 'Recent Watch',
+                    list: recentList,
+                    onClicked: _goContentScreen,
+                    onSeeAllClicked: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AllMovieScreen(
+                              title: 'Recent Watch', list: recentList),
+                        ),
+                      );
+                    },
+                  ),
+                  //book mark
+                  MovieSeeAllListView(
+                    title: 'BookMark',
+                    list: bookmarkList,
+                    onClicked: _goContentScreen,
+                    onSeeAllClicked: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AllMovieScreen(
+                              title: 'BookMark', list: bookmarkList),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+}

@@ -198,7 +198,7 @@ class MovieProvider with ChangeNotifier {
     }
   }
 
-  Future<void> initList() async {
+  Future<List<MovieModel>> initList() async {
     try {
       _isLoading = true;
       notifyListeners();
@@ -238,11 +238,12 @@ class MovieProvider with ChangeNotifier {
       //copy file
       for (var vd in noExistsCover) {
         final coverFile = File('$dbSourcePath/${vd.id}/cover.png');
-        final cacheCoverFile = File('$cachePath/${vd.path.getName()}.png');
-        if (!await cacheCoverFile.exists() || await coverFile.exists()) {
+        final cacheCoverFile =
+            File('$cachePath/${vd.path.getName(withExt: false)}.png');
+        if (!await cacheCoverFile.exists()) {
           continue;
         }
-        print(cacheCoverFile.path);
+        if (await coverFile.exists()) continue;
         //ရှိနေရင်
         await cacheCoverFile.copy(coverFile.path);
       }
@@ -254,6 +255,7 @@ class MovieProvider with ChangeNotifier {
       notifyListeners();
       debugPrint('initList: ${e.toString()}');
     }
+    return _list;
   }
 
   Future<void> add({required MovieModel movie}) async {
@@ -285,12 +287,6 @@ class MovieProvider with ChangeNotifier {
 
       final cachePath = PathUtil.instance.getCachePath();
       final databaseSourcePath = PathUtil.instance.getDatabaseSourcePath();
-
-      //cover gen
-      await ThanPkg.platform.genVideoCover(
-        outDirPath: cachePath,
-        videoPathList: pathList,
-      );
 
       //exsits title
       final existsTitle = _list.map((mv) => mv.title).toSet();

@@ -8,8 +8,8 @@ import 'package:movie_collections/app/screens/all_movie_screen.dart';
 import 'package:movie_collections/app/screens/movie_content_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../constants.dart';
-import '../widgets/index.dart';
+import '../../constants.dart';
+import '../../widgets/index.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -45,10 +45,11 @@ class _HomePageState extends State<HomePage> {
     void _goContentScreen(MovieModel movie) {
       context.read<MovieProvider>().setCurrent(movie);
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MovieContentScreen(),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => MovieContentScreen(),
+        ),
+      );
     }
 
     return MyScaffold(

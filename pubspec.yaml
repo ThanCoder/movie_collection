@@ -1,5 +1,5 @@
 name: movie_collections
-description: "Movie Collection"
+description: "movie စုဆောင်းရတာ ကြိုက်နှစ်သက်တဲ့ သူတွေအတွက်"
 version: 1.0.1
 publish_to: none
 
@@ -9,6 +9,7 @@ dependencies:
   cherry_toast: ^1.12.0
   cupertino_icons: ^1.0.8
   dio: ^5.8.0+1
+  expandable_text: ^2.3.0
   file_selector: ^1.0.3
   flutter:
     sdk: flutter
@@ -24,11 +25,10 @@ dependencies:
   mime: ^2.0.0
   path_provider: ^2.1.5
   provider: ^6.1.2
-  than_pkg: ^1.6.1
+  real_path_file_selector: ^0.0.6
+  than_pkg: ^1.6.2
   url_launcher: ^6.3.1
   uuid: ^4.5.1
-  real_path_file_selector: ^0.0.6
-  expandable_text: ^2.3.0
   window_manager: ^0.4.3
 
 dev_dependencies:
