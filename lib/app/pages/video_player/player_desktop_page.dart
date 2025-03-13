@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:than_pkg/enums/screen_orientation_types.dart';
 import 'package:than_pkg/than_pkg.dart';
 
+import '../../notifiers/app_notifier.dart';
+
 class PlayerDesktopPage extends StatefulWidget {
   const PlayerDesktopPage({super.key});
 
@@ -45,11 +47,21 @@ class _PlayerDesktopPageState extends State<PlayerDesktopPage> {
     try {
       final provider = context.read<MovieProvider>();
       final movie = provider.getCurrent!;
-      final existsList =
-          provider.getList.where((vd) => File(vd.path).existsSync()).toList();
-      //type splite
-      final movieTypedList =
-          existsList.where((mv) => mv.type == movie.type).toList();
+
+      List<MovieModel> movieTypedList = [];
+
+      if (appConfigNotifier.value.isOnlyShowExistsMovieFile) {
+        final existsList =
+            provider.getList.where((vd) => File(vd.path).existsSync()).toList();
+
+        //type splite
+        movieTypedList =
+            existsList.where((mv) => mv.type == movie.type).toList();
+      } else {
+        movieTypedList =
+            provider.getList.where((mv) => mv.type == movie.type).toList();
+      }
+
       setState(() {
         list = movieTypedList;
         currentPos = movieTypedList.indexWhere((vd) => vd.id == movie.id);
@@ -66,7 +78,7 @@ class _PlayerDesktopPageState extends State<PlayerDesktopPage> {
           currentPos = ev.index;
         });
       });
-      // _scrollTo(currentPos, 160);
+      _scrollTo(currentPos, 142);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -102,7 +114,8 @@ class _PlayerDesktopPageState extends State<PlayerDesktopPage> {
               currentPos = index;
             });
             player.jump(currentPos);
-            _scrollTo(index, itemHeight);
+            print(itemHeight);
+            // _scrollTo(index, itemHeight);
           },
         ),
       ),

@@ -5,12 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:movie_collections/app/dialogs/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
-import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/utils/index.dart';
 import 'package:provider/provider.dart';
 import 'package:real_path_file_selector/real_path_file_selector.dart';
-import 'package:uuid/uuid.dart';
 
 class MovieAddActionButton extends StatefulWidget {
   const MovieAddActionButton({super.key});
@@ -63,38 +61,38 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
     }
   }
 
-  void _newMovie() {
-    showDialog(
-      context: context,
-      builder: (context) => RenameDialog(
-        renameExistsTextList: context
-            .read<MovieProvider>()
-            .getList
-            .map((mv) => mv.title)
-            .toList(),
-        onCancel: () {},
-        onSubmit: (title) {
-          if (title.isEmpty) return;
-          final movie = MovieModel(
-            id: Uuid().v4(),
-            title: title,
-            path: '',
-            date: DateTime.now().millisecondsSinceEpoch,
-            type: MovieTypes.series.name,
-            infoType: MovieInfoTypes.info.name,
-            size: 0,
-          );
-          context.read<MovieProvider>().add(movie: movie);
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => MovieFormScreen(),
-          //   ),
-          // );
-        },
-      ),
-    );
-  }
+  // void _newMovie() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => RenameDialog(
+  //       renameExistsTextList: context
+  //           .read<MovieProvider>()
+  //           .getList
+  //           .map((mv) => mv.title)
+  //           .toList(),
+  //       onCancel: () {},
+  //       onSubmit: (title) {
+  //         if (title.isEmpty) return;
+  //         final movie = MovieModel(
+  //           id: Uuid().v4(),
+  //           title: title,
+  //           path: '',
+  //           date: DateTime.now().millisecondsSinceEpoch,
+  //           type: MovieTypes.series.name,
+  //           infoType: MovieInfoTypes.info.name,
+  //           size: 0,
+  //         );
+  //         context.read<MovieProvider>().add(movie: movie);
+  //         // Navigator.push(
+  //         //   context,
+  //         //   MaterialPageRoute(
+  //         //     builder: (context) => MovieFormScreen(),
+  //         //   ),
+  //         // );
+  //       },
+  //     ),
+  //   );
+  // }
 
   void _fromPath() {
     showDialog(

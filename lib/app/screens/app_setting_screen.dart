@@ -169,9 +169,22 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
                       ),
                     ),
                   )
-                : Container(),
+                : SizedBox.shrink(),
 
-            //
+            //is on
+            ListTileWithDesc(
+              title: "Only Show Exists Movie File",
+              desc: "Movie File တည်ရှိနေတာကိုပဲ ဖော်ပြပါ",
+              trailing: Checkbox(
+                value: config.isOnlyShowExistsMovieFile,
+                onChanged: (value) {
+                  setState(() {
+                    config.isOnlyShowExistsMovieFile = value!;
+                    isChanged = true;
+                  });
+                },
+              ),
+            ),
           ],
         ),
         floatingActionButton: isChanged

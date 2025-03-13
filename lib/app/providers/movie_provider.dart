@@ -7,6 +7,7 @@ import 'package:movie_collections/app/dialogs/core/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/extensions/string_extension.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
+import 'package:movie_collections/app/notifiers/app_notifier.dart';
 import 'package:movie_collections/app/services/movie_services.dart';
 import 'package:movie_collections/app/utils/path_util.dart';
 import 'package:real_path_file_selector/real_path_file_selector.dart';
@@ -207,7 +208,7 @@ class MovieProvider with ChangeNotifier {
       final databaseSourcePath = PathUtil.instance.getDatabaseSourcePath();
 
       _list.clear();
-      final res = _box.values.map((mv) {
+      var res = _box.values.map((mv) {
         mv.coverPath = '$databaseSourcePath/${mv.id}/cover.png';
         if (mv.infoType == MovieInfoTypes.data.name) {
           mv.path = '$databaseSourcePath/${mv.id}/${mv.id}';
@@ -221,9 +222,12 @@ class MovieProvider with ChangeNotifier {
         return 0;
       });
 
+      if (appConfigNotifier.value.isOnlyShowExistsMovieFile) {
+        res = res.where((vd) => File(vd.path).existsSync()).toList();
+      }
+
       _list.addAll(res);
-      // print(_list.map((vd) => vd.id).toSet());
-      //not exists cover file
+
       final noExistsCover = _list.where((vd) {
         final file = File(vd.coverPath);
         return !file.existsSync();

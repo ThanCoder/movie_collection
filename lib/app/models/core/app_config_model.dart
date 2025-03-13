@@ -3,11 +3,13 @@ class AppConfigModel {
   bool isUseCustomPath;
   String customPath;
   bool isDarkTheme;
+  bool isOnlyShowExistsMovieFile;
 
   AppConfigModel({
     this.isUseCustomPath = false,
     this.customPath = '',
     this.isDarkTheme = false,
+    this.isOnlyShowExistsMovieFile = false,
   });
 
   factory AppConfigModel.fromJson(Map<String, dynamic> map) {
@@ -15,11 +17,13 @@ class AppConfigModel {
       isUseCustomPath: map['is_use_custom_path'] ?? '',
       customPath: map['custom_path'] ?? '',
       isDarkTheme: map['is_dark_theme'] ?? false,
+      isOnlyShowExistsMovieFile: map['is_only_show_exists_movie_file'] ?? false,
     );
   }
   Map<String, dynamic> toJson() => {
         'is_use_custom_path': isUseCustomPath,
         'custom_path': customPath,
         'is_dark_theme': isDarkTheme,
+        'is_only_show_exists_movie_file': isOnlyShowExistsMovieFile,
       };
 }

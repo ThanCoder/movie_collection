@@ -7,12 +7,11 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/models/index.dart';
+import 'package:movie_collections/app/notifiers/app_notifier.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/services/index.dart';
-import 'package:movie_collections/app/services/movie_services.dart';
 import 'package:movie_collections/app/widgets/index.dart';
 import 'package:provider/provider.dart';
-import 'package:than_pkg/enums/screen_orientation_types.dart';
 import 'package:than_pkg/than_pkg.dart';
 
 class PlayerMobilePage extends StatefulWidget {
@@ -31,13 +30,16 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
 
   @override
   void initState() {
-    init();
     super.initState();
+    init();
   }
 
   @override
   void dispose() {
     player.dispose();
+    if (Platform.isAndroid) {
+      ThanPkg.android.app.hideFullScreen();
+    }
     super.dispose();
   }
 
@@ -55,11 +57,20 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
       } else {
         isResumed = true;
       }
-      final existsList =
-          provider.getList.where((vd) => File(vd.path).existsSync()).toList();
-      //type splite
-      final movieTypedList =
-          existsList.where((mv) => mv.type == movie.type).toList();
+      List<MovieModel> movieTypedList = [];
+
+      if (appConfigNotifier.value.isOnlyShowExistsMovieFile) {
+        final existsList =
+            provider.getList.where((vd) => File(vd.path).existsSync()).toList();
+
+        //type splite
+        movieTypedList =
+            existsList.where((mv) => mv.type == movie.type).toList();
+      } else {
+        movieTypedList =
+            provider.getList.where((mv) => mv.type == movie.type).toList();
+      }
+
       setState(() {
         list = movieTypedList;
         currentPos = movieTypedList.indexWhere((vd) => vd.id == movie.id);
@@ -78,7 +89,7 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
       });
       _play();
       //go item
-      _scrollTo(currentPos, 145);
+      _scrollTo(currentPos, 142);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -118,51 +129,6 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
     );
   }
 
-  Widget _getVideoList() {
-    return ListView.builder(
-      controller: scrollController,
-      itemCount: list.length,
-      itemBuilder: (context, index) => Container(
-        margin: EdgeInsets.only(bottom: 5),
-        child: MovieListItem(
-          isActiveColor: true,
-          currentIndex: index,
-          activeIndex: currentPos,
-          movie: list[index],
-          onClicked: (movie, itemHeight) {
-            setState(() {
-              currentPos = index;
-            });
-            player.jump(currentPos);
-            RecentMovieServices.instance.add(movieId: movie.id);
-            _scrollTo(index, itemHeight);
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _getDescWidget({double maxHeight = 250, double minHeight = 100}) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxHeight, minHeight: minHeight),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ExpandableText(
-            _getDescText(),
-            expandText: 'Read More',
-            collapseText: 'Read Less',
-            collapseOnTextTap: true,
-            maxLines: 3,
-            linkColor: Colors.blue,
-            urlStyle: TextStyle(color: Colors.blueAccent),
-            linkStyle: TextStyle(color: Colors.blueAccent),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _getVideo() {
     return Video(
       controller: controller,
@@ -171,12 +137,17 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
         final width = player.state.width ?? 0;
         if (height > width) {
           if (Platform.isAndroid) {
-            await ThanPkg.android.app
-                .requestOrientation(type: ScreenOrientationTypes.Portrait);
+            await ThanPkg.android.app.showFullScreen();
             return;
           }
         }
         await defaultEnterNativeFullscreen();
+      },
+      onExitFullscreen: () async {
+        if (Platform.isAndroid) {
+          await ThanPkg.android.app.hideFullScreen();
+        }
+        await defaultExitNativeFullscreen();
       },
     );
   }
@@ -239,7 +210,7 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
                     await player.jump(currentPos);
                     await _play();
 
-                    _scrollTo(index, itemHeight);
+                    print(itemHeight);
                   },
                 ),
               ),
