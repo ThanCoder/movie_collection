@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
@@ -9,7 +7,6 @@ import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/index.dart';
 import 'package:provider/provider.dart';
 import 'package:than_pkg/than_pkg.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class MovieContentActionButton extends StatefulWidget {
   VoidCallback onDoned;
@@ -67,13 +64,7 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
   void _openAnother() async {
     try {
       final movie = context.read<MovieProvider>().getCurrent!;
-      if (await canLaunchUrlString(movie.path)) {
-        launchUrlString(movie.path);
-      } else if (Platform.isAndroid) {
-        ThanPkg.android.app.openVideoWithIntent(path: movie.path);
-      } else if (Platform.isLinux) {
-        Process.runSync('xdg-open', [movie.path]);
-      }
+      ThanPkg.platform.launch(movie.path);
     } catch (e) {
       debugPrint(e.toString());
     }

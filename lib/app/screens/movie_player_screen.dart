@@ -2,6 +2,7 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/genres_wrap_view.dart';
 import 'package:movie_collections/app/components/index.dart';
+import 'package:movie_collections/app/extensions/datetime_extenstion.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/notifiers/movie_notifier.dart';
 import 'package:movie_collections/app/video_player/player_mobile_page.dart';
@@ -40,6 +41,10 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(movie.title),
+            //date
+            Text(DateTime.fromMillisecondsSinceEpoch(movie.date).toParseTime()),
+            Text(DateTime.fromMillisecondsSinceEpoch(movie.date).toTimeAgo()),
+            //watch button
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 201, 37, 25),

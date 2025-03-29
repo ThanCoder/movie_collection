@@ -26,8 +26,8 @@ dependencies:
   path_provider: ^2.1.5
   provider: ^6.1.2
   real_path_file_selector: ^0.0.6
-  than_pkg: ^1.6.4
-  url_launcher: ^6.3.1
+  than_pkg: ^1.6.5
+  timeago: ^3.2.2
   uuid: ^4.5.1
   window_manager: ^0.4.3
 
