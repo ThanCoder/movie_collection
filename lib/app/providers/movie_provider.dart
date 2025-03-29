@@ -201,8 +201,11 @@ class MovieProvider with ChangeNotifier {
     }
   }
 
-  Future<List<MovieModel>> initList() async {
+  Future<List<MovieModel>> initList({bool isReset = false}) async {
     try {
+      if (isReset == false && _list.isNotEmpty) {
+        return _list;
+      }
       _isLoading = true;
       notifyListeners();
 

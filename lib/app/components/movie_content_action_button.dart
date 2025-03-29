@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
@@ -6,6 +8,8 @@ import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/index.dart';
 import 'package:provider/provider.dart';
+import 'package:than_pkg/than_pkg.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class MovieContentActionButton extends StatefulWidget {
   VoidCallback onDoned;
@@ -60,6 +64,21 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
     );
   }
 
+  void _openAnother() async {
+    try {
+      final movie = context.read<MovieProvider>().getCurrent!;
+      if (await canLaunchUrlString(movie.path)) {
+        launchUrlString(movie.path);
+      } else if (Platform.isAndroid) {
+        ThanPkg.android.app.openVideoWithIntent(path: movie.path);
+      } else if (Platform.isLinux) {
+        Process.runSync('xdg-open', [movie.path]);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   void _showMenu(MovieModel movie) {
     showModalBottomSheet(
       context: context,
@@ -68,6 +87,16 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
           constraints: BoxConstraints(minHeight: 200),
           child: Column(
             children: [
+              //Open Another
+              ListTile(
+                leading: Icon(Icons.launch_rounded),
+                title: Text('Open Another'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _openAnother();
+                },
+              ),
+              //Edit
               ListTile(
                 leading: Icon(Icons.edit_document),
                 title: Text('Edit'),
@@ -76,6 +105,7 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
                   _goEdit();
                 },
               ),
+              //Restore
               movie.infoType == MovieInfoTypes.data.name
                   ? ListTile(
                       iconColor: Colors.amber,
@@ -87,6 +117,7 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
                       },
                     )
                   : SizedBox.shrink(),
+              //delete
               ListTile(
                 iconColor: Colors.red,
                 leading: Icon(Icons.delete_forever),

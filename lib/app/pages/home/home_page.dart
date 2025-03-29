@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/customs/movie_search_delegate.dart';
@@ -41,6 +43,8 @@ class _HomePageState extends State<HomePage> {
     final pornList =
         list.where((mv) => mv.type == MovieTypes.porns.name).toList();
     // final musicList = list.where((mv) => mv.type == MovieTypes.series.name).toList();
+    final randomList = List.of(list);
+    randomList.shuffle();
 
     void _goContentScreen(MovieModel movie) async {
       await context.read<MovieProvider>().setCurrent(movie);
@@ -70,6 +74,14 @@ class _HomePageState extends State<HomePage> {
             },
             icon: Icon(Icons.search),
           ),
+          Platform.isLinux
+              ? IconButton(
+                  onPressed: () async {
+                    await context.read<MovieProvider>().initList(isReset: true);
+                  },
+                  icon: Icon(Icons.refresh),
+                )
+              : SizedBox.shrink(),
           MovieAddActionButton(),
         ],
       ),
@@ -83,6 +95,24 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   spacing: 10,
                   children: [
+                    //random
+                    MovieSeeAllListView(
+                      title: 'Random',
+                      list: randomList,
+                      onClicked: _goContentScreen,
+                      onSeeAllClicked: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AllMovieScreen(
+                              list: randomList,
+                              title: 'Random',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    //latest
                     MovieSeeAllListView(
                       title: 'Latest Movie',
                       list: list,

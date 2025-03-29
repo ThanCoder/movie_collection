@@ -37,7 +37,6 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
     super.dispose();
   }
 
-  int currentPos = 0;
   bool isResumed = true;
 
   void init() async {
@@ -46,11 +45,6 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
       final movie = provider.getCurrent!;
 
       await player.open(Media(movie.path), play: true);
-      player.stream.playlist.listen((ev) {
-        setState(() {
-          currentPos = ev.index;
-        });
-      });
       _play();
     } catch (e) {
       debugPrint(e.toString());
@@ -70,7 +64,8 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
     RecentMovieServices.instance.add(movieId: movie.id);
   }
 
-  Widget _getVideo() {
+  @override
+  Widget build(BuildContext context) {
     return Video(
       controller: controller,
       width: 100,
@@ -93,16 +88,5 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
         await defaultExitNativeFullscreen();
       },
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _getVideo();
-    // return PopScope(
-    //   onPopInvokedWithResult: (didPop, result) async {
-    //     await _setPosition();
-    //   },
-    //   child: _getVideo(),
-    // );
   }
 }

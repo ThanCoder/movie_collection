@@ -4,7 +4,7 @@ import 'package:movie_collections/app/components/genres_wrap_view.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/notifiers/movie_notifier.dart';
-import 'package:movie_collections/app/pages/video_player/player_mobile_page.dart';
+import 'package:movie_collections/app/video_player/player_mobile_page.dart';
 import 'package:movie_collections/app/providers/movie_provider.dart';
 import 'package:movie_collections/app/screens/all_movie_screen.dart';
 import 'package:movie_collections/app/widgets/index.dart';
@@ -91,7 +91,7 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
   }
 
   List<MovieModel> _getRandomList() {
-    final list = context.read<MovieProvider>().getList;
+    final list = List.of(context.read<MovieProvider>().getList);
     final movie = context.read<MovieProvider>().getCurrent;
     if (movie == null) return [];
     list.shuffle();

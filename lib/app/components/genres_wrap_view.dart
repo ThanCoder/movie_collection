@@ -25,10 +25,15 @@ class GenresWrapView extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(197, 51, 48, 48),
+            color: const Color.fromARGB(225, 34, 34, 34),
             borderRadius: BorderRadius.circular(5),
           ),
-          child: Text(name.toCaptalize()),
+          child: Text(
+            name.toCaptalize(),
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );
