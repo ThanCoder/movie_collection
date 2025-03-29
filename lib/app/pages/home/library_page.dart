@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/components/movie_see_all_list_view.dart';
+import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/index.dart';
@@ -25,19 +25,28 @@ class _LibraryPageState extends State<LibraryPage> {
 
   List<MovieModel> recentList = [];
   List<MovieModel> bookmarkList = [];
+  bool isLoading = true;
 
   void init() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       final list = await context.read<MovieProvider>().initList();
       final bookmark = await BookmarkServices.instance.getList();
       final recent = await RecentMovieServices.instance.getList();
       bookmarkList = list.where((vd) => bookmark.contains(vd.id)).toList();
       recentList = list.where((vd) => recent.contains(vd.id)).toList();
-      recentList =
-          recent.map((id) => list.firstWhere((vd) => vd.id == id)).toList();
 
-      setState(() {});
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      if (!mounted) return;
+      showDialogMessage(context, e.toString());
       debugPrint(e.toString());
     }
   }
@@ -47,14 +56,13 @@ class _LibraryPageState extends State<LibraryPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MovieContentScreen(),
+        builder: (context) => MoviePlayerScreen(),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = context.watch<MovieProvider>().isLoading;
     return MyScaffold(
       appBar: AppBar(
         title: Text('Library'),

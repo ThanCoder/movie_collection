@@ -1022,10 +1022,10 @@ packages:
     dependency: "direct main"
     description:
       name: than_pkg
-      sha256: "071e8a053ec568adb97347cba2f0ce4512b1016713151dac9ef2934e8248c15d"
+      sha256: "8b344edf59be3189c045b96de0ed8adf784fb6fdd4b71459fd1c3e0dc51bc802"
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.2"
+    version: "1.6.4"
   timing:
     dependency: transitive
     description:

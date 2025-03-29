@@ -5,7 +5,7 @@ import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/all_movie_screen.dart';
-import 'package:movie_collections/app/screens/movie_content_screen.dart';
+import 'package:movie_collections/app/screens/movie_player_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
@@ -42,12 +42,13 @@ class _HomePageState extends State<HomePage> {
         list.where((mv) => mv.type == MovieTypes.porns.name).toList();
     // final musicList = list.where((mv) => mv.type == MovieTypes.series.name).toList();
 
-    void _goContentScreen(MovieModel movie) {
-      context.read<MovieProvider>().setCurrent(movie);
+    void _goContentScreen(MovieModel movie) async {
+      await context.read<MovieProvider>().setCurrent(movie);
+      if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MovieContentScreen(),
+          builder: (context) => MoviePlayerScreen(),
         ),
       );
     }
@@ -74,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: isLoading
           ? TLoader()
-          : RefreshIndicator.adaptive(
+          : RefreshIndicator(
               onRefresh: () async {
                 await init();
               },

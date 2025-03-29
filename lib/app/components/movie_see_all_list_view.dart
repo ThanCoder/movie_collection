@@ -8,6 +8,9 @@ class MovieSeeAllListView extends StatelessWidget {
   void Function(MovieModel movie) onClicked;
   void Function() onSeeAllClicked;
   int limit;
+  double width;
+  double height;
+  double fontSize;
   MovieSeeAllListView({
     super.key,
     required this.title,
@@ -15,6 +18,9 @@ class MovieSeeAllListView extends StatelessWidget {
     required this.onClicked,
     required this.onSeeAllClicked,
     this.limit = 5,
+    this.width = 150,
+    this.height = 160,
+    this.fontSize = 12,
   });
 
   @override
@@ -48,8 +54,8 @@ class MovieSeeAllListView extends StatelessWidget {
                     child: Stack(
                       children: [
                         SizedBox(
-                          width: 150,
-                          height: 160,
+                          width: width,
+                          height: height,
                           child: MyImageFile(
                             path: movie.coverPath,
                             width: double.infinity,
@@ -73,7 +79,7 @@ class MovieSeeAllListView extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: fontSize,
                                 color: Colors.white,
                               ),
                             ),

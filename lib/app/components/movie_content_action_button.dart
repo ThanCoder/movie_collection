@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
+import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/index.dart';
 import 'package:provider/provider.dart';
@@ -59,8 +60,7 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
     );
   }
 
-  void _showMenu() {
-    final movie = context.read<MovieProvider>().getCurrent!;
+  void _showMenu(MovieModel movie) {
     showModalBottomSheet(
       context: context,
       builder: (context) => SingleChildScrollView(
@@ -105,6 +105,8 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(onPressed: _showMenu, icon: Icon(Icons.more_vert));
+    return IconButton(
+        onPressed: () => _showMenu(context.read<MovieProvider>().getCurrent!),
+        icon: Icon(Icons.more_vert));
   }
 }

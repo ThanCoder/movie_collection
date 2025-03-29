@@ -8,6 +8,7 @@ import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/extensions/string_extension.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/notifiers/app_notifier.dart';
+import 'package:movie_collections/app/notifiers/movie_notifier.dart';
 import 'package:movie_collections/app/services/movie_services.dart';
 import 'package:movie_collections/app/utils/path_util.dart';
 import 'package:real_path_file_selector/real_path_file_selector.dart';
@@ -190,6 +191,7 @@ class MovieProvider with ChangeNotifier {
       notifyListeners();
 
       _movie = await MovieServices.instance.getMovieFullInfo(movie);
+      currentMovieNotifier.value = _movie;
       // await Future.delayed(Duration(milliseconds: 1200));
 
       _isLoading = false;

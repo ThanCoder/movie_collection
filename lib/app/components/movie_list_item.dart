@@ -10,6 +10,7 @@ class MovieListItem extends StatefulWidget {
   MovieModel movie;
   void Function(MovieModel movie, double itemHeight) onClicked;
   void Function(MovieModel movie)? onLongClicked;
+  void Function(MovieModel movie)? onMenuClicked;
   bool isActiveColor;
   int currentIndex;
   int activeIndex;
@@ -18,6 +19,7 @@ class MovieListItem extends StatefulWidget {
     super.key,
     required this.movie,
     required this.onClicked,
+    this.onMenuClicked,
     this.onLongClicked,
     this.isActiveColor = false,
     this.currentIndex = 0,
@@ -76,6 +78,7 @@ class _MovieListItemState extends State<MovieListItem> {
                         : null
                     : null),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 10,
               children: [
                 SizedBox(
@@ -94,15 +97,18 @@ class _MovieListItemState extends State<MovieListItem> {
                         style: TextStyle(fontSize: 12),
                       ),
                       //type
-                      Row(
-                        spacing: 5,
-                        children: [
-                          Text('Type: '),
-                          Text(widget.movie.type.toCaptalize()),
-                          SizedBox(width: 10),
-                          Text('InfoType: '),
-                          Text(widget.movie.infoType.toCaptalize()),
-                        ],
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          spacing: 5,
+                          children: [
+                            Text('Type: '),
+                            Text(widget.movie.type.toCaptalize()),
+                            SizedBox(width: 10),
+                            Text('InfoType: '),
+                            Text(widget.movie.infoType.toCaptalize()),
+                          ],
+                        ),
                       ),
 
                       // Text(widget.movie.tags),
@@ -113,6 +119,14 @@ class _MovieListItemState extends State<MovieListItem> {
                       MovieBookmarkButton(movie: widget.movie),
                     ],
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (widget.onMenuClicked != null) {
+                      widget.onMenuClicked!(widget.movie);
+                    }
+                  },
+                  icon: Icon(Icons.more_vert),
                 ),
               ],
             ),
