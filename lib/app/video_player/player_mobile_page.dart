@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:movie_collections/app/enums/movie_types.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/services/index.dart';
 import 'package:provider/provider.dart';
@@ -42,7 +43,10 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
   void init() async {
     try {
       final provider = context.read<MovieProvider>();
-      final movie = provider.getCurrent!;
+      final movie = provider.getCurrent;
+      if (movie == null) return;
+      //set recent
+      await RecentMovieServices.instance.add(movieId: movie.id);
 
       await player.open(Media(movie.path), play: true);
       _play();
@@ -53,40 +57,60 @@ class _PlayerMobilePageState extends State<PlayerMobilePage> {
 
   Future<void> _play() async {
     final movie = context.read<MovieProvider>().getCurrent!;
-    if (isResumed) {
+    if (movie.type != MovieTypes.music.name) {
       final dur = await MovieServices.instance.getPosition(movie: movie);
       await Future.delayed(Duration(milliseconds: 500));
-      if (dur != 0) {
-        player.seek(Duration(seconds: dur));
+      // print('get: ${dur.inSeconds}');
+      if (dur.inSeconds != 0) {
+        await player.seek(dur);
+        await player.play();
       }
     }
-    await player.play();
-    RecentMovieServices.instance.add(movieId: movie.id);
+  }
+
+  Future<void> _setResume() async {
+    final provider = context.read<MovieProvider>();
+    final movie = provider.getCurrent;
+    if (movie != null) {
+      if (movie.type != MovieTypes.music.name) {
+        // print('set: ${player.state.position.inSeconds}');
+        //no music
+        MovieServices.instance.setPosition(
+          movie: movie,
+          duration: player.state.position,
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Video(
-      controller: controller,
-      width: 100,
-      height: 200,
-      onEnterFullscreen: () async {
-        final height = player.state.height ?? 0;
-        final width = player.state.width ?? 0;
-        if (height > width) {
-          if (Platform.isAndroid) {
-            await ThanPkg.android.app.showFullScreen();
-            return;
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        _setResume();
+      },
+      child: Video(
+        controller: controller,
+        width: 100,
+        height: 200,
+        onEnterFullscreen: () async {
+          final height = player.state.height ?? 0;
+          final width = player.state.width ?? 0;
+          if (height > width) {
+            if (Platform.isAndroid) {
+              await ThanPkg.android.app.showFullScreen();
+              return;
+            }
           }
-        }
-        await defaultEnterNativeFullscreen();
-      },
-      onExitFullscreen: () async {
-        if (Platform.isAndroid) {
-          await ThanPkg.android.app.hideFullScreen();
-        }
-        await defaultExitNativeFullscreen();
-      },
+          await defaultEnterNativeFullscreen();
+        },
+        onExitFullscreen: () async {
+          if (Platform.isAndroid) {
+            await ThanPkg.android.app.hideFullScreen();
+          }
+          await defaultExitNativeFullscreen();
+        },
+      ),
     );
   }
 }

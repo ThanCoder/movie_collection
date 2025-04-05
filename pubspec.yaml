@@ -8,6 +8,7 @@ environment:
 dependencies:
   cherry_toast: ^1.12.0
   cupertino_icons: ^1.0.8
+  desktop_drop: ^0.5.0
   dio: ^5.8.0+1
   expandable_text: ^2.3.0
   file_selector: ^1.0.3
@@ -26,7 +27,7 @@ dependencies:
   path_provider: ^2.1.5
   provider: ^6.1.2
   real_path_file_selector: ^0.0.6
-  than_pkg: ^1.6.5
+  than_pkg: ^1.6.6
   timeago: ^3.2.2
   uuid: ^4.5.1
   window_manager: ^0.4.3

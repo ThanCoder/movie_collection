@@ -13,6 +13,7 @@ import 'package:movie_collections/app/services/movie_services.dart';
 import 'package:movie_collections/app/utils/path_util.dart';
 import 'package:real_path_file_selector/real_path_file_selector.dart';
 import 'package:than_pkg/than_pkg.dart';
+import 'package:than_pkg/types/src_dist_type.dart';
 import 'package:uuid/uuid.dart';
 
 class MovieProvider with ChangeNotifier {
@@ -209,10 +210,11 @@ class MovieProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final cachePath = PathUtil.instance.getCachePath();
+      // final cachePath = PathUtil.instance.getCachePath();
       final databaseSourcePath = PathUtil.instance.getDatabaseSourcePath();
 
       _list.clear();
+      // var res = _box.values.toList();
       var res = _box.values.map((mv) {
         mv.coverPath = '$databaseSourcePath/${mv.id}/cover.png';
         if (mv.infoType == MovieInfoTypes.data.name) {
@@ -233,29 +235,18 @@ class MovieProvider with ChangeNotifier {
 
       _list.addAll(res);
 
-      final noExistsCover = _list.where((vd) {
+      final noExistsCoverList = _list.where((vd) {
         final file = File(vd.coverPath);
         return !file.existsSync();
       }).toList();
 
-      //cover gen
-      await ThanPkg.platform.genVideoCover(
-        outDirPath: cachePath,
-        videoPathList: noExistsCover.map((vd) => vd.path).toList(),
-      );
-      final dbSourcePath = PathUtil.instance.getDatabaseSourcePath();
-      //copy file
-      for (var vd in noExistsCover) {
-        final coverFile = File('$dbSourcePath/${vd.id}/cover.png');
-        final cacheCoverFile =
-            File('$cachePath/${vd.path.getName(withExt: false)}.png');
-        if (!await cacheCoverFile.exists()) {
-          continue;
-        }
-        if (await coverFile.exists()) continue;
-        //ရှိနေရင်
-        await cacheCoverFile.copy(coverFile.path);
-      }
+      final genList = noExistsCoverList
+          .map((movie) => SrcDistType(
+                src: movie.path,
+                dist: movie.coverPath,
+              ))
+          .toList();
+      await ThanPkg.platform.genVideoThumbnail(pathList: genList);
 
       _isLoading = false;
       notifyListeners();
@@ -294,7 +285,7 @@ class MovieProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final cachePath = PathUtil.instance.getCachePath();
+      // final cachePath = PathUtil.instance.getCachePath();
       final databaseSourcePath = PathUtil.instance.getDatabaseSourcePath();
 
       //exsits title
@@ -317,6 +308,7 @@ class MovieProvider with ChangeNotifier {
           infoType: movieInfoType.name,
           date: DateTime.now().millisecondsSinceEpoch,
           size: File(path).statSync().size,
+          ext: path.getExt(),
         );
         //add db
         _box.add(newMovie);
@@ -325,11 +317,10 @@ class MovieProvider with ChangeNotifier {
         final source =
             PathUtil.instance.createDir('$databaseSourcePath/${newMovie.id}');
 
-        //copy cover
-        final cacheCoverFile = File('$cachePath/$title.png');
-        if (await cacheCoverFile.exists()) {
-          await cacheCoverFile.copy('$source/cover.png');
-        }
+        //gen cover
+        // final genList =
+        //     pathList.map((path) => SrcDistType(src: path, dist: '')).toList();
+        // await ThanPkg.platform.genVideoThumbnail(pathList: genList);
         //check movie type
         if (newMovie.infoType == MovieInfoTypes.data.name) {
           //သူက movie file ကို move မယ်
@@ -337,8 +328,7 @@ class MovieProvider with ChangeNotifier {
           await movieFile.rename('$source/${newMovie.id}');
         }
       }
-
-      initList();
+      initList(isReset: true);
     } catch (e) {
       _isLoading = false;
       notifyListeners();

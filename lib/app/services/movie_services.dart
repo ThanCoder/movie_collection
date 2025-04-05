@@ -32,7 +32,7 @@ class MovieServices {
     }
   }
 
-  Future<int> getPosition({required MovieModel movie}) async {
+  Future<Duration> getPosition({required MovieModel movie}) async {
     int res = 0;
     try {
       final source = '${PathUtil.instance.getDatabaseSourcePath()}/${movie.id}';
@@ -48,16 +48,16 @@ class MovieServices {
     } catch (e) {
       debugPrint('getPosition: ${e.toString()}');
     }
-    return res;
+    return Duration(seconds: res);
   }
 
   Future<void> setPosition(
-      {required MovieModel movie, required int duration}) async {
+      {required MovieModel movie, required Duration duration}) async {
     try {
       final source = '${PathUtil.instance.getDatabaseSourcePath()}/${movie.id}';
       final dbFile =
           File('${PathUtil.instance.createDir(source)}/position.txt');
-      await dbFile.writeAsString('$duration');
+      await dbFile.writeAsString('${duration.inSeconds}');
     } catch (e) {
       debugPrint('setPosition: ${e.toString()}');
     }

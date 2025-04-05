@@ -23,7 +23,8 @@ class MovieModel {
   int date;
   @HiveField(7, defaultValue: 0)
   int size;
-
+  @HiveField(8, defaultValue: '')
+  String ext;
   String content;
   String coverPath = '';
   bool isSelected = false;
@@ -38,6 +39,7 @@ class MovieModel {
     required this.infoType,
     required this.date,
     required this.size,
+    required this.ext,
   });
 
   String getSourcePath() {

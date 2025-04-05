@@ -25,13 +25,14 @@ class MovieModelAdapter extends TypeAdapter<MovieModel> {
       infoType: fields[3] as String,
       date: fields[6] as int,
       size: fields[7] == null ? 0 : fields[7] as int,
+      ext: fields[8] == null ? '' : fields[8] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, MovieModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class MovieModelAdapter extends TypeAdapter<MovieModel> {
       ..writeByte(6)
       ..write(obj.date)
       ..writeByte(7)
-      ..write(obj.size);
+      ..write(obj.size)
+      ..writeByte(8)
+      ..write(obj.ext);
   }
 
   @override

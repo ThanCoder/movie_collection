@@ -61,39 +61,6 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
     }
   }
 
-  // void _newMovie() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => RenameDialog(
-  //       renameExistsTextList: context
-  //           .read<MovieProvider>()
-  //           .getList
-  //           .map((mv) => mv.title)
-  //           .toList(),
-  //       onCancel: () {},
-  //       onSubmit: (title) {
-  //         if (title.isEmpty) return;
-  //         final movie = MovieModel(
-  //           id: Uuid().v4(),
-  //           title: title,
-  //           path: '',
-  //           date: DateTime.now().millisecondsSinceEpoch,
-  //           type: MovieTypes.series.name,
-  //           infoType: MovieInfoTypes.info.name,
-  //           size: 0,
-  //         );
-  //         context.read<MovieProvider>().add(movie: movie);
-  //         // Navigator.push(
-  //         //   context,
-  //         //   MaterialPageRoute(
-  //         //     builder: (context) => MovieFormScreen(),
-  //         //   ),
-  //         // );
-  //       },
-  //     ),
-  //   );
-  // }
-
   void _fromPath() {
     showDialog(
       context: context,

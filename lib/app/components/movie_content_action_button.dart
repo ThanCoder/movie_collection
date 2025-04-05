@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
@@ -64,7 +66,11 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
   void _openAnother() async {
     try {
       final movie = context.read<MovieProvider>().getCurrent!;
-      ThanPkg.platform.launch(movie.path);
+      if (Platform.isAndroid) {
+        await ThanPkg.android.app.openVideoWithIntent(path: movie.path);
+      } else {
+        ThanPkg.platform.launch(movie.path);
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
