@@ -23,7 +23,7 @@ class MovieModel {
   int date;
   @HiveField(7, defaultValue: 0)
   int size;
-  @HiveField(8, defaultValue: '')
+  @HiveField(8, defaultValue: 'mp4')
   String ext;
   String content;
   String coverPath = '';
@@ -39,7 +39,7 @@ class MovieModel {
     required this.infoType,
     required this.date,
     required this.size,
-    required this.ext,
+    this.ext = 'mp4',
   });
 
   String getSourcePath() {
@@ -50,4 +50,7 @@ class MovieModel {
   String toString() {
     return title;
   }
+
+  static List<String> getDataColumnHeaderList() =>
+      ['Title', 'Type', 'Info Type', 'Size', 'Ext', 'Date'];
 }

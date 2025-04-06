@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/constants.dart';
+import 'package:movie_collections/app/models/movie_model.dart';
+import 'package:movie_collections/app/providers/movie_provider.dart';
 import 'package:movie_collections/app/utils/index.dart';
 
 class BookmarkServices {
@@ -68,6 +70,21 @@ class BookmarkServices {
       debugPrint('getList: ${e.toString()}');
     }
     return list;
+  }
+
+  Future<List<MovieModel>> getMovieList() async {
+    List<MovieModel> movieList = [];
+    final idList = await getList();
+    final list = MovieProvider.getDB.values;
+
+    for (var id in idList) {
+      final movie = list.where((mv) => mv.id == id);
+      if (movie.isNotEmpty) {
+        movieList.add(movie.first);
+      }
+    }
+
+    return movieList;
   }
 
   String getDBPath() {

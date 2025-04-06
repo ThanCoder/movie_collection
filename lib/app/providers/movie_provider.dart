@@ -17,6 +17,10 @@ import 'package:than_pkg/types/src_dist_type.dart';
 import 'package:uuid/uuid.dart';
 
 class MovieProvider with ChangeNotifier {
+  // static final MovieProvider instance = MovieProvider._();
+  // MovieProvider._();
+  // factory MovieProvider() => instance;
+
   final List<MovieModel> _list = [];
   MovieModel? _movie;
   bool _isLoading = false;
@@ -24,6 +28,7 @@ class MovieProvider with ChangeNotifier {
   List<MovieModel> get getList => _list;
   bool get isLoading => _isLoading;
   MovieModel? get getCurrent => _movie;
+  static Box<MovieModel> get getDB => Hive.box<MovieModel>(MovieModel.getName);
 
   late Box<MovieModel> _box;
 
@@ -47,7 +52,7 @@ class MovieProvider with ChangeNotifier {
             _isLoading = true;
             notifyListeners();
             String restorePath =
-                '${PathUtil.instance.getOutPath()}/${movie.title}.mp4';
+                '${PathUtil.instance.getOutPath()}/${movie.title}.${movie.ext.isEmpty ? 'mp4' : movie.ext}';
             //move
             await file.rename(restorePath);
 
@@ -160,6 +165,30 @@ class MovieProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('delete: ${e.toString()}');
+    }
+  }
+
+  Future<void> deleteMultiple(List<MovieModel> list) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      for (var movie in list) {
+        final index = _list.indexWhere((mv) => mv.id == movie.id);
+        final dbIndex =
+            _box.values.toList().indexWhere((mv) => mv.id == movie.id);
+        //ui
+        _list.removeAt(index);
+        //db
+        await _box.deleteAt(dbIndex);
+        //delete folder
+        await MovieServices.instance.deleteMovieFullInfo(movie);
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('deleteMultiple: ${e.toString()}');
     }
   }
 

@@ -34,9 +34,8 @@ class _LibraryPageState extends State<LibraryPage> {
       });
       final list = await context.read<MovieProvider>().initList();
       final bookmark = await BookmarkServices.instance.getList();
-      final recent = await RecentMovieServices.instance.getList();
       bookmarkList = list.where((vd) => bookmark.contains(vd.id)).toList();
-      recentList = list.where((vd) => recent.contains(vd.id)).toList();
+      recentList = await RecentMovieServices.instance.getMovieList();
 
       setState(() {
         isLoading = false;

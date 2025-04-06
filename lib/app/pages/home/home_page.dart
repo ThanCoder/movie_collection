@@ -123,7 +123,6 @@ class _HomePageState extends State<HomePage> {
               showSearch(
                 context: context,
                 delegate: MovieSearchDelegate(
-                  list: list,
                   onClicked: _goContentScreen,
                 ),
               );

@@ -6,6 +6,7 @@ import 'package:mime/mime.dart';
 import 'package:movie_collections/app/dialogs/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
+import 'package:movie_collections/app/screens/movie_list_table_screen.dart';
 import 'package:movie_collections/app/utils/index.dart';
 import 'package:provider/provider.dart';
 import 'package:real_path_file_selector/real_path_file_selector.dart';
@@ -125,6 +126,7 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
               //     _newMovie();
               //   },
               // ),
+              //add from path
               ListTile(
                 leading: Icon(Icons.add),
                 title: Text('Add From Path'),
@@ -133,12 +135,27 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
                   _fromPath();
                 },
               ),
+              //add from path selector
               ListTile(
                 leading: Icon(Icons.add),
                 title: Text('Add From Path Selector'),
                 onTap: () {
                   Navigator.pop(context);
                   _pathSelector();
+                },
+              ),
+              //movie table
+              ListTile(
+                leading: Icon(Icons.table_rows_rounded),
+                title: Text('Movie List'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MovieListTableScreen(),
+                    ),
+                  );
                 },
               ),
             ],

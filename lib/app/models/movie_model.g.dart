@@ -25,7 +25,7 @@ class MovieModelAdapter extends TypeAdapter<MovieModel> {
       infoType: fields[3] as String,
       date: fields[6] as int,
       size: fields[7] == null ? 0 : fields[7] as int,
-      ext: fields[8] == null ? '' : fields[8] as String,
+      ext: fields[8] == null ? 'mp4' : fields[8] as String,
     );
   }
 

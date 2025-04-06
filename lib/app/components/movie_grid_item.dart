@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/widgets/core/index.dart';
 
@@ -13,7 +14,6 @@ class MovieGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // print('type: ${movie.infoType} - cover:${movie.coverPath}');
     return GestureDetector(
       onTap: () => onClicked(movie),
       child: MouseRegion(
@@ -30,6 +30,7 @@ class MovieGridItem extends StatelessWidget {
                 ),
               ],
             ),
+            // title
             Positioned(
               bottom: 0,
               left: 0,
@@ -53,6 +54,15 @@ class MovieGridItem extends StatelessWidget {
                     fontSize: 12,
                   ),
                 ),
+              ),
+            ),
+            // info
+            Positioned(
+              child: Icon(
+                size: 20,
+                movie.infoType == MovieInfoTypes.info.name
+                    ? Icons.info_rounded
+                    : Icons.video_file,
               ),
             ),
           ],

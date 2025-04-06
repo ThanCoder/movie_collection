@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
+import 'package:movie_collections/app/extensions/datetime_extenstion.dart';
+import 'package:movie_collections/app/extensions/double_extension.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/index.dart';
@@ -76,6 +78,31 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
     }
   }
 
+  void _showInfo(MovieModel movie) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Info'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Title: ${movie.title}'),
+              Text('Ext: ${movie.ext}'),
+              Text('Type: ${movie.type}'),
+              Text('InfoType: ${movie.infoType}'),
+              Text('Size: ${movie.size.toDouble().toFileSizeLabel()}'),
+              Text('Tags: ${movie.tags}'),
+              Text(
+                  'Date: ${DateTime.fromMillisecondsSinceEpoch(movie.date).toParseTime()}'),
+              Text('Path: ${movie.path}'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showMenu(MovieModel movie) {
     showModalBottomSheet(
       context: context,
@@ -85,12 +112,23 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
           child: Column(
             children: [
               //Open Another
+              movie.infoType != MovieInfoTypes.info.name
+                  ? ListTile(
+                      leading: Icon(Icons.launch_rounded),
+                      title: Text('Open Another'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _openAnother();
+                      },
+                    )
+                  : SizedBox.shrink(),
+              //Info
               ListTile(
-                leading: Icon(Icons.launch_rounded),
-                title: Text('Open Another'),
+                leading: Icon(Icons.info_outlined),
+                title: Text('Info'),
                 onTap: () {
                   Navigator.pop(context);
-                  _openAnother();
+                  _showInfo(movie);
                 },
               ),
               //Edit
