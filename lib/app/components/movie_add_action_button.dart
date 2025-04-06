@@ -47,12 +47,14 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
         context: context,
         barrierDismissible: false,
         builder: (context) => MovieTypeChooserDialog(
-          onSubmited: (MovieTypes movieType, MovieInfoTypes movieInfoType) {
+          onSubmited: (MovieTypes movieType, MovieInfoTypes movieInfoType,
+              String tags) {
             if (!mounted) return;
             context.read<MovieProvider>().addFromPathList(
                   pathList: pathList,
                   movieInfoType: movieInfoType,
                   movieType: movieType,
+                  tags: tags,
                 );
           },
         ),
@@ -91,13 +93,14 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
               context: context,
               barrierDismissible: false,
               builder: (context) => MovieTypeChooserDialog(
-                onSubmited:
-                    (MovieTypes movieType, MovieInfoTypes movieInfoType) {
+                onSubmited: (MovieTypes movieType, MovieInfoTypes movieInfoType,
+                    String tags) {
                   if (!mounted) return;
                   context.read<MovieProvider>().addFromPathList(
                         pathList: pathList,
                         movieInfoType: movieInfoType,
                         movieType: movieType,
+                        tags: tags,
                       );
                 },
               ),

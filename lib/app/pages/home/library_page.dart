@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
+import 'package:movie_collections/app/components/tag_list.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/index.dart';
@@ -70,6 +71,8 @@ class _LibraryPageState extends State<LibraryPage> {
           ? TLoader()
           : SingleChildScrollView(
               child: Column(
+                spacing: 5,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //recent
                   MovieSeeAllListView(
@@ -101,6 +104,9 @@ class _LibraryPageState extends State<LibraryPage> {
                       );
                     },
                   ),
+                  //tags wap list view
+                  Text('Tags'),
+                  TagList(),
                 ],
               ),
             ),

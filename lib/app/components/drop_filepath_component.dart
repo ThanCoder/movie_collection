@@ -33,7 +33,10 @@ class DropFilepathComponent extends StatelessWidget {
           borderRadius: BorderRadius.circular(2),
         ),
         child: Center(
-          child: Text(title),
+          child: Text(
+            title,
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );

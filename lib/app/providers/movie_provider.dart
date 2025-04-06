@@ -36,6 +36,62 @@ class MovieProvider with ChangeNotifier {
     _box = Hive.box<MovieModel>(MovieModel.getName);
   }
 
+  Future<List<MovieModel>> initList({bool isReset = false}) async {
+    try {
+      if (isReset == false && _list.isNotEmpty) {
+        return _list;
+      }
+      _isLoading = true;
+      notifyListeners();
+
+      // final cachePath = PathUtil.instance.getCachePath();
+      final databaseSourcePath = PathUtil.instance.getDatabaseSourcePath();
+
+      _list.clear();
+      // var res = _box.values.toList();
+      var res = _box.values.map((mv) {
+        mv.coverPath = '$databaseSourcePath/${mv.id}/cover.png';
+        if (mv.infoType == MovieInfoTypes.data.name) {
+          mv.path = '$databaseSourcePath/${mv.id}/${mv.id}';
+        }
+        return mv;
+      }).toList();
+
+      res.sort((a, b) {
+        if (a.date > b.date) return -1;
+        if (a.date < b.date) return 1;
+        return 0;
+      });
+
+      if (appConfigNotifier.value.isOnlyShowExistsMovieFile) {
+        res = res.where((vd) => File(vd.path).existsSync()).toList();
+      }
+
+      _list.addAll(res);
+
+      final noExistsCoverList = _list.where((vd) {
+        final file = File(vd.coverPath);
+        return !file.existsSync();
+      }).toList();
+
+      final genList = noExistsCoverList
+          .map((movie) => SrcDistType(
+                src: movie.path,
+                dist: movie.coverPath,
+              ))
+          .toList();
+      await ThanPkg.platform.genVideoThumbnail(pathList: genList);
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      debugPrint('initList: ${e.toString()}');
+    }
+    return _list;
+  }
+
   void restoreMovieFile(BuildContext context,
       {required MovieModel movie, required VoidCallback onDoned}) {
     showDialog(
@@ -231,62 +287,6 @@ class MovieProvider with ChangeNotifier {
     }
   }
 
-  Future<List<MovieModel>> initList({bool isReset = false}) async {
-    try {
-      if (isReset == false && _list.isNotEmpty) {
-        return _list;
-      }
-      _isLoading = true;
-      notifyListeners();
-
-      // final cachePath = PathUtil.instance.getCachePath();
-      final databaseSourcePath = PathUtil.instance.getDatabaseSourcePath();
-
-      _list.clear();
-      // var res = _box.values.toList();
-      var res = _box.values.map((mv) {
-        mv.coverPath = '$databaseSourcePath/${mv.id}/cover.png';
-        if (mv.infoType == MovieInfoTypes.data.name) {
-          mv.path = '$databaseSourcePath/${mv.id}/${mv.id}';
-        }
-        return mv;
-      }).toList();
-
-      res.sort((a, b) {
-        if (a.date > b.date) return -1;
-        if (a.date < b.date) return 1;
-        return 0;
-      });
-
-      if (appConfigNotifier.value.isOnlyShowExistsMovieFile) {
-        res = res.where((vd) => File(vd.path).existsSync()).toList();
-      }
-
-      _list.addAll(res);
-
-      final noExistsCoverList = _list.where((vd) {
-        final file = File(vd.coverPath);
-        return !file.existsSync();
-      }).toList();
-
-      final genList = noExistsCoverList
-          .map((movie) => SrcDistType(
-                src: movie.path,
-                dist: movie.coverPath,
-              ))
-          .toList();
-      await ThanPkg.platform.genVideoThumbnail(pathList: genList);
-
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      debugPrint('initList: ${e.toString()}');
-    }
-    return _list;
-  }
-
   Future<void> add({required MovieModel movie}) async {
     try {
       _isLoading = true;
@@ -309,6 +309,7 @@ class MovieProvider with ChangeNotifier {
     required List<String> pathList,
     required MovieTypes movieType,
     required MovieInfoTypes movieInfoType,
+    required String tags,
   }) async {
     try {
       _isLoading = true;
@@ -332,6 +333,7 @@ class MovieProvider with ChangeNotifier {
         final newMovie = MovieModel(
           id: Uuid().v4(),
           title: title,
+          tags: tags,
           path: path,
           type: movieType.name,
           infoType: movieInfoType.name,

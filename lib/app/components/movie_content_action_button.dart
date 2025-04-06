@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
+import 'package:movie_collections/app/components/tag_list_tile_button.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/extensions/datetime_extenstion.dart';
@@ -70,8 +71,9 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
       final movie = context.read<MovieProvider>().getCurrent!;
       if (Platform.isAndroid) {
         await ThanPkg.android.app.openVideoWithIntent(path: movie.path);
-      } else {
-        ThanPkg.platform.launch(movie.path);
+      }
+      if (Platform.isLinux) {
+        ThanPkg.linux.app.launch(movie.path);
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -112,16 +114,14 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
           child: Column(
             children: [
               //Open Another
-              movie.infoType != MovieInfoTypes.info.name
-                  ? ListTile(
-                      leading: Icon(Icons.launch_rounded),
-                      title: Text('Open Another'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _openAnother();
-                      },
-                    )
-                  : SizedBox.shrink(),
+              ListTile(
+                leading: Icon(Icons.launch_rounded),
+                title: Text('Open Another'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _openAnother();
+                },
+              ),
               //Info
               ListTile(
                 leading: Icon(Icons.info_outlined),
@@ -130,6 +130,11 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
                   Navigator.pop(context);
                   _showInfo(movie);
                 },
+              ),
+              //set tags
+              TagListTileButton(
+                values: movie.tags,
+                onChoosed: (values) {},
               ),
               //Edit
               ListTile(

@@ -2,9 +2,12 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/genres_wrap_view.dart';
 import 'package:movie_collections/app/components/index.dart';
+import 'package:movie_collections/app/components/movie_tag_list.dart';
 import 'package:movie_collections/app/extensions/datetime_extenstion.dart';
+import 'package:movie_collections/app/extensions/double_extension.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/notifiers/movie_notifier.dart';
+import 'package:movie_collections/app/services/tag_services.dart';
 import 'package:movie_collections/app/video_player/player_mobile_page.dart';
 import 'package:movie_collections/app/providers/movie_provider.dart';
 import 'package:movie_collections/app/screens/all_movie_screen.dart';
@@ -31,7 +34,7 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
   }
 
   Widget _getContent() {
-    final movie = currentMovieNotifier.value;
+    final movie = context.watch<MovieProvider>().getCurrent;
     if (movie == null) return const SizedBox.shrink();
     return Card(
       child: Padding(
@@ -40,7 +43,8 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(movie.title),
+            SelectableText(movie.title),
+            Text(movie.size.toDouble().toFileSizeLabel()),
             //date
             Text(DateTime.fromMillisecondsSinceEpoch(movie.date).toParseTime()),
             Text(DateTime.fromMillisecondsSinceEpoch(movie.date).toTimeAgo()),
@@ -70,6 +74,19 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
               children: [
                 MovieBookmarkButton(movie: movie),
               ],
+            ),
+            MovieTagList(
+              movie: movie,
+              onClicked: (name) {
+                final list = TagServices.instance.getMovieList(name);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AllMovieScreen(list: list, title: '#$name'),
+                  ),
+                );
+              },
             ),
             const Divider(),
             //descritpion
@@ -114,22 +131,24 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
   Widget build(BuildContext context) {
     return MyScaffold(
       contentPadding: 0,
-      appBar: AppBar(
-        title: Text('အသေးစိတ်'),
-        actions: [
-          MovieContentActionButton(
-            onDoned: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
       body: CustomScrollView(
         slivers: [
+          //app bar
+          SliverAppBar(
+            title: Text('အသေးစိတ်'),
+            actions: [
+              MovieContentActionButton(
+                onDoned: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+          //movie player
           SliverAppBar(
             automaticallyImplyLeading: false,
-            expandedHeight: 200,
-            collapsedHeight: 200,
+            expandedHeight: 150,
+            collapsedHeight: 150,
             pinned: true,
             floating: true,
             flexibleSpace: _getCurrentPlayer(),

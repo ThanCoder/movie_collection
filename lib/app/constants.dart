@@ -16,6 +16,7 @@ const appMainDatabaseName = 'main.db.json';
 const appBookmarkDatabaseName = 'bookmark.db.json';
 const appRecentDatabaseName = 'recent.db.json';
 const appGenresDatabaseName = 'genres.db.json';
+const appTagsDatabaseName = 'tags.db.json';
 
 final activeColor = Colors.teal[600];
 const dangerColor = Colors.red;
