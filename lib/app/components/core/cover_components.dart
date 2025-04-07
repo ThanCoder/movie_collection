@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:mime/mime.dart';
+import 'package:movie_collections/app/components/drop_filepath_container.dart';
 
 import '../../dialogs/core/index.dart';
 import '../../services/core/app_services.dart';
@@ -99,44 +101,66 @@ class _CoverComponentsState extends State<CoverComponents> {
   void _showMenu() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => ListView(
-        children: [
-          ListTile(
-            onTap: () {
-              Navigator.pop(context);
-              _addFromPath();
-            },
-            leading: const Icon(Icons.add),
-            title: const Text('Add From Path'),
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.pop(context);
-              _downloadUrl();
-            },
-            leading: const Icon(Icons.add),
-            title: const Text('Add From Url'),
-          ),
-        ],
+      builder: (context) => SingleChildScrollView(
+        child: Column(
+          children: [
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+                _addFromPath();
+              },
+              leading: const Icon(Icons.add),
+              title: const Text('Add From Path'),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+                _downloadUrl();
+              },
+              leading: const Icon(Icons.add),
+              title: const Text('Add From Url'),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: _showMenu,
-        child: SizedBox(
-          width: 150,
-          height: 150,
-          child: isLoading
-              ? TLoader()
-              : MyImageFile(
-                  path: imagePath,
-                  borderRadius: 5,
-                ),
+    return DropFilepathContainer(
+      onDroped: (items) async {
+        setState(() {
+          isLoading = true;
+        });
+        final path = items.first.path;
+        final mime = lookupMimeType(path);
+        if (mime == null || !mime.startsWith('image')) return;
+        final file = File(path);
+        if (widget.coverPath.isNotEmpty) {
+          await file.copy(widget.coverPath);
+          // clear image cache
+          await clearAndRefreshImage();
+        }
+        imagePath = path;
+        setState(() {
+          isLoading = false;
+        });
+      },
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: _showMenu,
+          child: SizedBox(
+            width: 150,
+            height: 150,
+            child: isLoading
+                ? TLoader()
+                : MyImageFile(
+                    path: imagePath,
+                    borderRadius: 5,
+                  ),
+          ),
         ),
       ),
     );

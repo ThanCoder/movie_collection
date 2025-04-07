@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'notifiers/app_notifier.dart';
 import 'screens/index.dart';
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

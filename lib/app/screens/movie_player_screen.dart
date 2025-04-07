@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/genres_wrap_view.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/components/movie_tag_list.dart';
-import 'package:movie_collections/app/extensions/datetime_extenstion.dart';
-import 'package:movie_collections/app/extensions/double_extension.dart';
+import 'package:movie_collections/app/extensions/index.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
-import 'package:movie_collections/app/notifiers/movie_notifier.dart';
+import 'package:movie_collections/app/services/movie_content_cover_serices.dart';
 import 'package:movie_collections/app/services/tag_services.dart';
 import 'package:movie_collections/app/video_player/player_mobile_page.dart';
 import 'package:movie_collections/app/providers/movie_provider.dart';
@@ -24,14 +23,63 @@ class MoviePlayerScreen extends StatefulWidget {
 class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
   bool isShowCover = true;
 
-  Widget _getCurrentPlayer() {
-    final movie = currentMovieNotifier.value;
-    if (movie == null) return const SizedBox.shrink();
-    if (isShowCover) {
-      return MyImageFile(path: movie.coverPath);
-    }
-    return PlayerMobilePage();
+  void _showImage(String path) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        contentPadding: EdgeInsets.all(0),
+        content: MyImageFile(
+          path: path,
+          fit: BoxFit.fill,
+        ),
+      ),
+    );
   }
+
+  Widget _getContentCoverWidget() {
+    final movie = context.read<MovieProvider>().getCurrent!;
+    return FutureBuilder(
+      future: MovieContentCoverSerices.instance.getList(movie.id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MyImageFile(path: movie.coverPath);
+        }
+        if (isShowCover) {
+          if (snapshot.hasData) {
+            final list = snapshot.data ?? [];
+            if (list.isEmpty) {
+              return MyImageFile(path: movie.coverPath);
+            }
+            // return MyImageFile(path: movie.coverPath);
+            return CarouselView.weighted(
+              onTap: (value) => _showImage(
+                MovieContentCoverSerices.getImagePath(movie.id, list[value]),
+              ),
+              // itemExtent: 200,
+              flexWeights: [2, 1],
+              children: list
+                  .map((name) => MyImageFile(
+                        path: MovieContentCoverSerices.getImagePath(
+                            movie.id, name),
+                        // fit: BoxFit.fill,
+                      ))
+                  .toList(),
+            );
+          }
+        }
+        return PlayerMobilePage();
+      },
+    );
+  }
+
+  // Widget _getCurrentPlayer() {
+  //   final movie = currentMovieNotifier.value;
+  //   if (movie == null) return const SizedBox.shrink();
+  //   if (isShowCover) {
+  //     return MyImageFile(path: movie.coverPath);
+  //   }
+  //   return PlayerMobilePage();
+  // }
 
   Widget _getContent() {
     final movie = context.watch<MovieProvider>().getCurrent;
@@ -55,13 +103,13 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
               ),
               onPressed: () {
                 setState(() {
-                  isShowCover = false;
+                  isShowCover = !isShowCover;
                 });
               },
               child: SizedBox(
                 width: double.infinity,
                 child: Text(
-                  'ကြည့်မည်',
+                  isShowCover ? 'ကြည့်မည်' : 'Show Cover',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),
@@ -131,99 +179,107 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
   Widget build(BuildContext context) {
     return MyScaffold(
       contentPadding: 0,
-      body: CustomScrollView(
-        slivers: [
-          //app bar
-          SliverAppBar(
-            title: Text('အသေးစိတ်'),
-            actions: [
-              MovieContentActionButton(
-                onDoned: () {
-                  Navigator.pop(context);
-                },
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 600,
+          ),
+          child: CustomScrollView(
+            slivers: [
+              //app bar
+              SliverAppBar(
+                title: Text('အသေးစိတ်'),
+                actions: [
+                  MovieContentActionButton(
+                    onDoned: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+              //movie player
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                expandedHeight: PlatformExtension.isDesktop() ? 250 : 200,
+                collapsedHeight: PlatformExtension.isDesktop() ? 250 : 150,
+                pinned: true,
+                floating: true,
+                // flexibleSpace: _getCurrentPlayer(),
+                flexibleSpace: _getContentCoverWidget(),
+              ),
+              //content
+              SliverToBoxAdapter(
+                child: _getContent(),
+              ),
+              //related
+              SliverToBoxAdapter(
+                child: Card(
+                  child: MovieSeeAllListView(
+                    title: 'Related',
+                    width: 100,
+                    height: 130,
+                    fontSize: 10,
+                    list: _getRelatedList(),
+                    onClicked: (movie) async {
+                      await context.read<MovieProvider>().setCurrent(movie);
+                      if (!mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MoviePlayerScreen(),
+                        ),
+                      );
+                    },
+                    onSeeAllClicked: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AllMovieScreen(
+                            title: 'Related',
+                            list: _getRelatedList(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              //random list
+              SliverToBoxAdapter(
+                child: Card(
+                  child: MovieSeeAllListView(
+                    title: 'Random',
+                    width: 100,
+                    height: 130,
+                    fontSize: 10,
+                    list: _getRandomList(),
+                    onClicked: (movie) async {
+                      await context.read<MovieProvider>().setCurrent(movie);
+                      if (!mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MoviePlayerScreen(),
+                        ),
+                      );
+                    },
+                    onSeeAllClicked: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AllMovieScreen(
+                            title: 'Random',
+                            list: _getRandomList(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ],
           ),
-          //movie player
-          SliverAppBar(
-            automaticallyImplyLeading: false,
-            expandedHeight: 150,
-            collapsedHeight: 150,
-            pinned: true,
-            floating: true,
-            flexibleSpace: _getCurrentPlayer(),
-          ),
-          //content
-          SliverToBoxAdapter(
-            child: _getContent(),
-          ),
-          //related
-          SliverToBoxAdapter(
-            child: Card(
-              child: MovieSeeAllListView(
-                title: 'Related',
-                width: 100,
-                height: 130,
-                fontSize: 10,
-                list: _getRelatedList(),
-                onClicked: (movie) async {
-                  await context.read<MovieProvider>().setCurrent(movie);
-                  if (!mounted) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MoviePlayerScreen(),
-                    ),
-                  );
-                },
-                onSeeAllClicked: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AllMovieScreen(
-                        title: 'Related',
-                        list: _getRelatedList(),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          //random list
-          SliverToBoxAdapter(
-            child: Card(
-              child: MovieSeeAllListView(
-                title: 'Random',
-                width: 100,
-                height: 130,
-                fontSize: 10,
-                list: _getRandomList(),
-                onClicked: (movie) async {
-                  await context.read<MovieProvider>().setCurrent(movie);
-                  if (!mounted) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MoviePlayerScreen(),
-                    ),
-                  );
-                },
-                onSeeAllClicked: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AllMovieScreen(
-                        title: 'Random',
-                        list: _getRandomList(),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

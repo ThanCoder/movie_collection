@@ -5,7 +5,7 @@ import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/components/tag_list_tile_button.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
-import 'package:movie_collections/app/extensions/datetime_extenstion.dart';
+import 'package:movie_collections/app/extensions/datetime_extension.dart';
 import 'package:movie_collections/app/extensions/double_extension.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';

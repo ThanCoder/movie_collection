@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/dialogs/core/confirm_dialog.dart';
-import 'package:movie_collections/app/extensions/datetime_extenstion.dart';
+import 'package:movie_collections/app/extensions/datetime_extension.dart';
 import 'package:movie_collections/app/extensions/double_extension.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';

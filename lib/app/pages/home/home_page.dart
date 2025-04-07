@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
-import 'package:movie_collections/app/components/drop_filepath_component.dart';
+import 'package:movie_collections/app/components/drop_filepath_container.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/customs/movie_search_delegate.dart';
 import 'package:movie_collections/app/dialogs/movie_type_chooser_dialog.dart';
 import 'package:movie_collections/app/enums/index.dart';
+import 'package:movie_collections/app/extensions/index.dart';
 import 'package:movie_collections/app/models/index.dart';
+import 'package:movie_collections/app/notifiers/movie_notifier.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/all_movie_screen.dart';
 import 'package:movie_collections/app/screens/movie_player_screen.dart';
@@ -24,10 +26,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => init());
   }
 
@@ -35,8 +38,8 @@ class _HomePageState extends State<HomePage> {
     await context.read<MovieProvider>().initList();
   }
 
-  void addMovieFilePath(List<DropItem> itemList) {
-    final pathList = itemList
+  void addMovieFilePath(List<DropItem> items) {
+    final pathList = items
         .where((item) => (lookupMimeType(item.path) ?? '').startsWith('video'))
         .map((item) => item.path)
         .toList();
@@ -58,6 +61,36 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  Widget dropFilepathContainerListenable({required Widget child}) {
+    return ValueListenableBuilder(
+      valueListenable: isHomePageDropableNotifier,
+      builder: (context, isEnable, _child) {
+        return DropFilepathContainer(
+          onDroped: isEnable ? addMovieFilePath : null,
+          child: child,
+        );
+      },
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      print('resume');
+    }
+    if (state == AppLifecycleState.paused) {
+      print('paused');
+    }
+    print('called');
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -92,13 +125,8 @@ class _HomePageState extends State<HomePage> {
           spacing: 3,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Platform.isLinux
-                ? DropFilepathComponent(
-                    onDroped: addMovieFilePath,
-                    containerSize: 100,
-                  )
-                : SizedBox.shrink(),
-            Text('List Empty...'),
+            Text(
+                'List Empty... ${PlatformExtension.isDesktop() ? 'File Drop Here...' : ''}'),
             IconButton(
               color: Colors.blue,
               onPressed: () async {
@@ -116,9 +144,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(appTitle),
         actions: [
-          Platform.isLinux && list.isNotEmpty
-              ? DropFilepathComponent(onDroped: addMovieFilePath)
-              : SizedBox.shrink(),
           IconButton(
             onPressed: () {
               showSearch(
@@ -141,101 +166,103 @@ class _HomePageState extends State<HomePage> {
           MovieAddActionButton(),
         ],
       ),
-      body: isLoading
-          ? TLoader()
-          : list.isEmpty
-              ? _getRefreshWidget()
-              : RefreshIndicator(
-                  onRefresh: () async {
-                    await init();
-                  },
-                  child: SingleChildScrollView(
-                    child: Column(
-                      spacing: 10,
-                      children: [
-                        //random
-                        MovieSeeAllListView(
-                          title: 'Random',
-                          list: randomList,
-                          onClicked: _goContentScreen,
-                          onSeeAllClicked: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AllMovieScreen(
-                                  list: randomList,
-                                  title: 'Random',
+      body: dropFilepathContainerListenable(
+        child: isLoading
+            ? TLoader()
+            : list.isEmpty
+                ? _getRefreshWidget()
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      await init();
+                    },
+                    child: SingleChildScrollView(
+                      child: Column(
+                        spacing: 10,
+                        children: [
+                          //random
+                          MovieSeeAllListView(
+                            title: 'Random',
+                            list: randomList,
+                            onClicked: _goContentScreen,
+                            onSeeAllClicked: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllMovieScreen(
+                                    list: randomList,
+                                    title: 'Random',
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        //latest
-                        MovieSeeAllListView(
-                          title: 'Latest Movie',
-                          list: list,
-                          onClicked: _goContentScreen,
-                          onSeeAllClicked: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AllMovieScreen(
-                                  list: list,
-                                  title: 'Latest Movie',
+                              );
+                            },
+                          ),
+                          //latest
+                          MovieSeeAllListView(
+                            title: 'Latest Movie',
+                            list: list,
+                            onClicked: _goContentScreen,
+                            onSeeAllClicked: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllMovieScreen(
+                                    list: list,
+                                    title: 'Latest Movie',
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        //Movie
-                        MovieSeeAllListView(
-                          title: 'Movie',
-                          list: movieList,
-                          onClicked: _goContentScreen,
-                          onSeeAllClicked: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AllMovieScreen(
-                                    title: 'Latest Movie', list: movieList),
-                              ),
-                            );
-                          },
-                        ),
-                        //Music
-                        MovieSeeAllListView(
-                          title: 'Music',
-                          list: musicList,
-                          onClicked: _goContentScreen,
-                          onSeeAllClicked: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AllMovieScreen(
-                                    title: 'Latest Music', list: musicList),
-                              ),
-                            );
-                          },
-                        ),
-                        //Porns
-                        MovieSeeAllListView(
-                          title: 'Porns',
-                          list: pornList,
-                          onClicked: _goContentScreen,
-                          onSeeAllClicked: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AllMovieScreen(
-                                    title: 'Latest Porns', list: pornList),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                              );
+                            },
+                          ),
+                          //Movie
+                          MovieSeeAllListView(
+                            title: 'Movie',
+                            list: movieList,
+                            onClicked: _goContentScreen,
+                            onSeeAllClicked: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllMovieScreen(
+                                      title: 'Latest Movie', list: movieList),
+                                ),
+                              );
+                            },
+                          ),
+                          //Music
+                          MovieSeeAllListView(
+                            title: 'Music',
+                            list: musicList,
+                            onClicked: _goContentScreen,
+                            onSeeAllClicked: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllMovieScreen(
+                                      title: 'Latest Music', list: musicList),
+                                ),
+                              );
+                            },
+                          ),
+                          //Porns
+                          MovieSeeAllListView(
+                            title: 'Porns',
+                            list: pornList,
+                            onClicked: _goContentScreen,
+                            onSeeAllClicked: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllMovieScreen(
+                                      title: 'Latest Porns', list: pornList),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+      ),
     );
   }
 }
