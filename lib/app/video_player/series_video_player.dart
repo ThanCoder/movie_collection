@@ -21,8 +21,12 @@ class _SeriesVideoPlayerState extends State<SeriesVideoPlayer> {
   late final controller = VideoController(player);
   final ScrollController scrollController = ScrollController();
 
+  late SeriesVideoPlayerProvider _seriesVideoPlayerProvider;
+
   @override
   void initState() {
+    _seriesVideoPlayerProvider = context.read<SeriesVideoPlayerProvider>();
+    _seriesVideoPlayerProvider.addListener(_providerListener);
     super.initState();
     init();
   }
@@ -30,16 +34,31 @@ class _SeriesVideoPlayerState extends State<SeriesVideoPlayer> {
   void init() async {
     final provider = context.read<SeriesVideoPlayerProvider>();
 
-    final medias = provider.list
-        .map((ep) =>
-            Media(MovieSeasonServices.getVideoPath(provider.movieId, ep)))
-        .toList();
-    await player.open(Playlist(medias), play: true);
+    // final medias = provider.list
+    //     .map((ep) =>
+    //         Media(MovieSeasonServices.getVideoPath(provider.movieId, ep)))
+    //     .toList();
+    // await player.open(Playlist(medias), play: true);
+    if (provider.list.isEmpty) return;
+    final path = MovieSeasonServices.getVideoPath(
+      provider.movieId,
+      provider.list[provider.currentIndex],
+    );
+    await player.open(Media(path), play: true);
+  }
+
+  void _providerListener() async {
+    final provider = context.read<SeriesVideoPlayerProvider>();
+    final episode = provider.currentEpisode;
+    if (episode == null) return;
+    final path = MovieSeasonServices.getVideoPath(provider.movieId, episode);
+    await player.open(Media(path), play: true);
   }
 
   @override
   void dispose() {
     player.dispose();
+    _seriesVideoPlayerProvider.removeListener(_providerListener);
     if (Platform.isAndroid) {
       ThanPkg.android.app.hideFullScreen();
     }
@@ -49,27 +68,41 @@ class _SeriesVideoPlayerState extends State<SeriesVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Video(
-      controller: controller,
-      width: size.width,
-      height: size.height,
-      onEnterFullscreen: () async {
-        final height = player.state.height ?? 0;
-        final width = player.state.width ?? 0;
-        if (height > width) {
-          if (Platform.isAndroid) {
-            await ThanPkg.android.app.showFullScreen();
-            return;
-          }
-        }
-        await defaultEnterNativeFullscreen();
-      },
-      onExitFullscreen: () async {
-        if (Platform.isAndroid) {
-          await ThanPkg.android.app.hideFullScreen();
-        }
-        await defaultExitNativeFullscreen();
-      },
+    final episode = context.watch<SeriesVideoPlayerProvider>().currentEpisode;
+    return Column(
+      children: [
+        episode == null
+            ? SizedBox.shrink()
+            : Text(
+                '${episode.episodeNumber}: ${episode.title}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+        Expanded(
+          child: Video(
+            controller: controller,
+            width: size.width,
+            // height: size.height,
+            onEnterFullscreen: () async {
+              final height = player.state.height ?? 0;
+              final width = player.state.width ?? 0;
+              if (height > width) {
+                if (Platform.isAndroid) {
+                  await ThanPkg.android.app.showFullScreen();
+                  return;
+                }
+              }
+              await defaultEnterNativeFullscreen();
+            },
+            onExitFullscreen: () async {
+              if (Platform.isAndroid) {
+                await ThanPkg.android.app.hideFullScreen();
+              }
+              await defaultExitNativeFullscreen();
+            },
+          ),
+        ),
+      ],
     );
   }
 }

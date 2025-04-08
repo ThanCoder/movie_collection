@@ -1,16 +1,13 @@
 import 'dart:io';
-
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:movie_collections/app/dialogs/index.dart';
 import 'package:movie_collections/app/dialogs/series_form_dialog.dart';
 import 'package:movie_collections/app/enums/index.dart';
+import 'package:movie_collections/app/lib_components/path_chooser.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/movie_list_table_screen.dart';
-import 'package:movie_collections/app/utils/index.dart';
 import 'package:provider/provider.dart';
-import 'package:real_path_file_selector/real_path_file_selector.dart';
 
 class MovieAddActionButton extends StatefulWidget {
   const MovieAddActionButton({super.key});
@@ -22,25 +19,8 @@ class MovieAddActionButton extends StatefulWidget {
 class _MovieAddActionButtonState extends State<MovieAddActionButton> {
   void _pathSelector() async {
     try {
-      List<String> pathList = [];
-
-      if (Platform.isLinux) {
-        final files = await openFiles(
-          acceptedTypeGroups: [
-            XTypeGroup(extensions: ['.mp4', '.mkv'], mimeTypes: ['video/mp4']),
-          ],
-        );
-
-        if (files.isEmpty) return;
-        pathList = files.map((f) => f.path).toList();
-      } else if (Platform.isAndroid) {
-        pathList = await RealPathFileSelector.openFileScanner.open(
-          context,
-          mimeType: 'video',
-          title: 'Choose Movie',
-          thumbnailDirPath: PathUtil.instance.getCachePath(),
-        );
-      }
+      final pathList = await platformVideoPathChooser(context);
+      if (pathList.isEmpty) return;
 
       ///choose type
       if (!mounted) return;

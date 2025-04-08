@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:movie_collections/app/components/content_cover_grid_item.dart';
 import 'package:movie_collections/app/components/drop_filepath_container.dart';
+import 'package:movie_collections/app/extensions/index.dart';
+import 'package:movie_collections/app/lib_components/path_chooser.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/services/movie_content_cover_serices.dart';
 import 'package:movie_collections/app/widgets/core/index.dart';
@@ -43,21 +42,8 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
 
   void _addFromPath() async {
     try {
-      final files = await openFiles(
-        acceptedTypeGroups: [
-          XTypeGroup(mimeTypes: [
-            'image/png',
-            'image/jpg',
-            'image/webp',
-            'image/jpeg'
-          ]),
-        ],
-      );
-      final list = files
-          .where((file) =>
-              File(file.path).statSync().type == FileSystemEntityType.file)
-          .map((file) => file.path)
-          .toList();
+      final list = await platformImagePathChooser();
+      if (list.isEmpty) return;
       if (!mounted) return;
       context.read<MovieProvider>().addContentCover(pathList: list);
     } catch (e) {
@@ -86,7 +72,10 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
         child: isLoading
             ? TLoader()
             : list.isEmpty
-                ? Center(child: Text('Drop Here...'))
+                ? Center(
+                    child: Text(PlatformExtension.isDesktop()
+                        ? 'Image Drop Here...'
+                        : 'List Empty...'))
                 : RefreshIndicator(
                     onRefresh: () async {
                       context.read<MovieProvider>().initContentCoverList();

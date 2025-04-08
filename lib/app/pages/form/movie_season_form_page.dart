@@ -1,5 +1,4 @@
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:movie_collections/app/components/drop_filepath_container.dart';
@@ -7,6 +6,7 @@ import 'package:movie_collections/app/components/season_list_view.dart';
 import 'package:movie_collections/app/dialogs/episode_add_form_dialog.dart';
 import 'package:movie_collections/app/dialogs/episode_edit_form_dialog.dart';
 import 'package:movie_collections/app/dialogs/index.dart';
+import 'package:movie_collections/app/lib_components/path_chooser.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/widgets/index.dart';
 import 'package:provider/provider.dart';
@@ -34,19 +34,8 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
 
   void _pickFiles() async {
     try {
-      final items = await openFiles(
-        acceptedTypeGroups: [
-          XTypeGroup(mimeTypes: [
-            'video/mp4',
-            'video/mkv',
-          ]),
-        ],
-      );
-      choosedPathList = items
-          .where(
-              (file) => (lookupMimeType(file.path) ?? '').startsWith('video'))
-          .map((file) => file.path)
-          .toList();
+      choosedPathList = await platformVideoPathChooser(context);
+      if (choosedPathList.isEmpty) return;
       _addConfirm();
     } catch (e) {
       debugPrint(e.toString());

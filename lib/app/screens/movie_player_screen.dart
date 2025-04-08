@@ -50,7 +50,9 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
     }
     if (isShowCover) {
       if (list.isEmpty) {
-        return MyImageFile(path: movie.coverPath);
+        return GestureDetector(
+            onTap: () => _showImage(movie.coverPath),
+            child: MyImageFile(path: movie.coverPath));
       }
       // return MyImageFile(path: movie.coverPath);
       return CarouselView.weighted(
@@ -179,14 +181,19 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
         onLoaded: (epList) {
           seriesVideoPlayerProvider.setMovidId(movie.id);
           seriesVideoPlayerProvider.setList(epList);
+          seriesVideoPlayerProvider.setCurrentIndex(0);
         },
         onSeasonChanged: (epList) {
           seriesVideoPlayerProvider.setList(epList);
+          seriesVideoPlayerProvider.setCurrentIndex(0);
         },
         onEpisodeClicked: (index, episode) {
           seriesVideoPlayerProvider.setCurrentIndex(index);
-          isShowCover = false;
-          setState(() {});
+          seriesVideoPlayerProvider.setCurrentEpisode(episode);
+          if (isShowCover == true) {
+            isShowCover = false;
+            setState(() {});
+          }
         },
       );
     }
