@@ -1,48 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
-import 'package:movie_collections/app/components/tag_list_chooser.dart';
-import 'package:movie_collections/app/enums/index.dart';
+import 'package:movie_collections/app/enums/movie_info_types.dart';
 import 'package:movie_collections/app/extensions/string_extension.dart';
 
-class MovieTypeChooserDialog extends StatefulWidget {
-  void Function(MovieTypes movieType, MovieInfoTypes movieInfoType, String tags)
-      onSubmited;
-  MovieTypeChooserDialog({super.key, required this.onSubmited});
+class EpisodeAddFormDialog extends StatefulWidget {
+  void Function(MovieInfoTypes movieInfoType) onSubmited;
+  EpisodeAddFormDialog({super.key, required this.onSubmited});
 
   @override
-  State<MovieTypeChooserDialog> createState() => _MovieTypeChooserDialogState();
+  State<EpisodeAddFormDialog> createState() => _EpisodeAddFormDialogState();
 }
 
-class _MovieTypeChooserDialogState extends State<MovieTypeChooserDialog> {
-  MovieTypes movieType = MovieTypes.movie;
+class _EpisodeAddFormDialogState extends State<EpisodeAddFormDialog> {
   MovieInfoTypes movieInfoType = MovieInfoTypes.info;
-  String tags = '';
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Movie Types ရွေးချယ်ပါ'),
+      title: Text('Choose Types'),
       content: SingleChildScrollView(
         child: Column(
-          spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // type
-            Row(
-              spacing: 5,
-              children: [
-                Text('Movie Type'),
-                MovieTypeChooser(
-                  type: movieType,
-                  onChoosed: (type) {
-                    setState(() {
-                      movieType = type;
-                    });
-                  },
-                ),
-              ],
-            ),
-            // info type
             Row(
               spacing: 5,
               children: [
@@ -56,15 +35,6 @@ class _MovieTypeChooserDialogState extends State<MovieTypeChooserDialog> {
                   },
                 ),
               ],
-            ),
-            Text('Choose Tags'),
-            TagListChooser(
-              tags: tags,
-              onChanged: (String value) {
-                setState(() {
-                  tags = value;
-                });
-              },
             ),
             // info
             Text(
@@ -85,7 +55,7 @@ class _MovieTypeChooserDialogState extends State<MovieTypeChooserDialog> {
         TextButton(
           onPressed: () {
             Navigator.pop(context);
-            widget.onSubmited(movieType, movieInfoType, tags);
+            widget.onSubmited(movieInfoType);
           },
           child: Text('Submit'),
         ),

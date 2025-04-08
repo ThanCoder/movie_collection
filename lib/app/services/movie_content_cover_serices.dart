@@ -12,8 +12,9 @@ class MovieContentCoverSerices {
 
   Future<void> remove({required String movieId, required int index}) async {
     final dbList = await getList(movieId);
+    final imageId = dbList[index];
     //file
-    final imageFile = File('${getDBPath(movieId)}/${dbList[index]}');
+    final imageFile = File(getImagePath(movieId, imageId));
     if (await imageFile.exists()) {
       await imageFile.delete();
     }

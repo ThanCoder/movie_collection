@@ -43,6 +43,20 @@ class _TagFormDialogState extends State<TagFormDialog> {
     }).toList();
     if (!mounted) return;
     setState(() {});
+    _checkError();
+  }
+
+  void _checkError() {
+    final res = list.where((tag) => tag.name == titleController.text);
+    if (res.isNotEmpty) {
+      setState(() {
+        errorText = 'title ရှိနေပြီးသား ဖြစ်နေပါတယ်!';
+      });
+    } else {
+      setState(() {
+        errorText = null;
+      });
+    }
   }
 
   void _selectItem(TagModel tag, bool isChecked) {
@@ -79,6 +93,7 @@ class _TagFormDialogState extends State<TagFormDialog> {
             controller: titleController,
             label: Text('Title...'),
             isSelectedAll: true,
+            errorText: errorText,
             onSubmitted: (val) => _addTag(),
             onChanged: (value) {
               if (value.isEmpty) {
@@ -92,11 +107,10 @@ class _TagFormDialogState extends State<TagFormDialog> {
                 errorText = null;
               });
             },
-            errorText: errorText,
           ),
         ),
         IconButton(
-          onPressed: _addTag,
+          onPressed: errorText == null ? _addTag : null,
           icon: Icon(Icons.add_rounded),
         ),
       ],
@@ -144,6 +158,12 @@ class _TagFormDialogState extends State<TagFormDialog> {
         TextButton(
           onPressed: () {
             Navigator.pop(context);
+          },
+          child: Text('Close'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
             widget.onSubmited(
               list
                   .where((tg) => tg.isSelected)
@@ -158,29 +178,3 @@ class _TagFormDialogState extends State<TagFormDialog> {
     );
   }
 }
-
-/*
-CustomScrollView(
-          slivers: [
-            // SliverToBoxAdapter(child: _form()),
-            SliverList.builder(
-              itemCount: list.length,
-              itemBuilder: (context, index) {
-                final tag = list[index];
-                return Row(
-                  children: [
-                    Checkbox(
-                      value: tag.isSelected,
-                      onChanged: (value) {
-                        _selectItem(tag, value!);
-                      },
-                    ),
-                    Text(tag.name),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-
-        */

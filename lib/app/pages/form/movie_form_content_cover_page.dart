@@ -23,30 +23,9 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
   @override
   void initState() {
     super.initState();
-    init();
-  }
-
-  List<String> list = [];
-  bool isLoading = false;
-
-  void init() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      list = await MovieContentCoverSerices.instance
-          .getList(context.read<MovieProvider>().getCurrent!.id);
-
-      if (!mounted) return;
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        isLoading = false;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MovieProvider>().initContentCoverList();
+    });
   }
 
   void _addCover(List<DropItem> items) async {
@@ -56,12 +35,7 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
               (item) => (lookupMimeType(item.path) ?? '').startsWith('image'))
           .map((item) => item.path)
           .toList();
-      await MovieContentCoverSerices.instance.add(
-        movieId: context.read<MovieProvider>().getCurrent!.id,
-        pathList: list,
-      );
-      if (!mounted) return;
-      setState(() {});
+      context.read<MovieProvider>().addContentCover(pathList: list);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -69,9 +43,6 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
 
   void _addFromPath() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
       final files = await openFiles(
         acceptedTypeGroups: [
           XTypeGroup(mimeTypes: [
@@ -87,25 +58,19 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
               File(file.path).statSync().type == FileSystemEntityType.file)
           .map((file) => file.path)
           .toList();
-
       if (!mounted) return;
-      await MovieContentCoverSerices.instance.add(
-        movieId: context.read<MovieProvider>().getCurrent!.id,
-        pathList: list,
-      );
-      if (!mounted) return;
-      init();
+      context.read<MovieProvider>().addContentCover(pathList: list);
     } catch (e) {
       debugPrint(e.toString());
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final movieId = context.watch<MovieProvider>().getCurrent!.id;
+    final provider = context.watch<MovieProvider>();
+    final movieId = provider.getCurrent!.id;
+    final isLoading = provider.isLoading;
+    final list = provider.contentCoverList;
     return MyScaffold(
       appBar: AppBar(
         title: Text('Content Cover'),
@@ -124,7 +89,7 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
                 ? Center(child: Text('Drop Here...'))
                 : RefreshIndicator(
                     onRefresh: () async {
-                      init();
+                      context.read<MovieProvider>().initContentCoverList();
                     },
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(

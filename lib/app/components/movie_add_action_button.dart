@@ -4,6 +4,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:movie_collections/app/dialogs/index.dart';
+import 'package:movie_collections/app/dialogs/series_form_dialog.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/movie_list_table_screen.dart';
@@ -113,6 +114,14 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
     );
   }
 
+  void _newSeries() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SeriesFormDialog(),
+    );
+  }
+
   void _showMenu() {
     showModalBottomSheet(
       context: context,
@@ -121,14 +130,14 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // ListTile(
-              //   leading: Icon(Icons.add),
-              //   title: Text('New Movie'),
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //     _newMovie();
-              //   },
-              // ),
+              ListTile(
+                leading: Icon(Icons.add),
+                title: Text('New Series'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _newSeries();
+                },
+              ),
               //add from path
               ListTile(
                 leading: Icon(Icons.add),

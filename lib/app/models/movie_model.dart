@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movie_collections/app/utils/path_util.dart';
+import 'package:uuid/uuid.dart';
 
 part 'movie_model.g.dart';
 
@@ -41,6 +42,24 @@ class MovieModel {
     required this.size,
     this.ext = 'mp4',
   });
+
+  factory MovieModel.create({
+    required String title,
+    required String path,
+    required String type,
+    required String infoType,
+    required int size,
+  }) {
+    return MovieModel(
+      id: Uuid().v4(),
+      title: title,
+      path: path,
+      type: type,
+      infoType: infoType,
+      date: DateTime.now().millisecondsSinceEpoch,
+      size: size,
+    );
+  }
 
   String getSourcePath() {
     return '${PathUtil.instance.getDatabaseSourcePath()}/$id/$id';

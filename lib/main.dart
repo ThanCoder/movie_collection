@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/providers/index.dart';
+import 'package:movie_collections/app/providers/series_video_player_provider.dart';
 import 'package:movie_collections/app/utils/index.dart';
 import 'package:provider/provider.dart';
 import 'package:than_pkg/than_pkg.dart';
@@ -30,7 +31,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MovieProvider()),
-        ChangeNotifierProvider(create: (context) => SeriesProvider()),
+        ChangeNotifierProvider(
+            create: (context) => SeriesVideoPlayerProvider()),
       ],
       child: const MyApp(),
     ),

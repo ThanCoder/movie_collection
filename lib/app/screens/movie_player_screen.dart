@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/genres_wrap_view.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/components/movie_tag_list.dart';
+import 'package:movie_collections/app/components/season_wrap_list_view.dart';
+import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/extensions/index.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
+import 'package:movie_collections/app/providers/series_video_player_provider.dart';
 import 'package:movie_collections/app/services/movie_content_cover_serices.dart';
 import 'package:movie_collections/app/services/tag_services.dart';
 import 'package:movie_collections/app/video_player/player_mobile_page.dart';
 import 'package:movie_collections/app/providers/movie_provider.dart';
 import 'package:movie_collections/app/screens/all_movie_screen.dart';
+import 'package:movie_collections/app/video_player/series_video_player.dart';
 import 'package:movie_collections/app/widgets/index.dart';
 import 'package:provider/provider.dart';
 
@@ -37,49 +41,37 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
   }
 
   Widget _getContentCoverWidget() {
-    final movie = context.read<MovieProvider>().getCurrent!;
-    return FutureBuilder(
-      future: MovieContentCoverSerices.instance.getList(movie.id),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return MyImageFile(path: movie.coverPath);
-        }
-        if (isShowCover) {
-          if (snapshot.hasData) {
-            final list = snapshot.data ?? [];
-            if (list.isEmpty) {
-              return MyImageFile(path: movie.coverPath);
-            }
-            // return MyImageFile(path: movie.coverPath);
-            return CarouselView.weighted(
-              onTap: (value) => _showImage(
-                MovieContentCoverSerices.getImagePath(movie.id, list[value]),
-              ),
-              // itemExtent: 200,
-              flexWeights: [2, 1],
-              children: list
-                  .map((name) => MyImageFile(
-                        path: MovieContentCoverSerices.getImagePath(
-                            movie.id, name),
-                        // fit: BoxFit.fill,
-                      ))
-                  .toList(),
-            );
-          }
-        }
-        return PlayerMobilePage();
-      },
-    );
+    final provider = context.watch<MovieProvider>();
+    final isLoading = provider.isLoading;
+    final movie = provider.getCurrent!;
+    final list = provider.contentCoverList;
+    if (isLoading) {
+      return MyImageFile(path: movie.coverPath);
+    }
+    if (isShowCover) {
+      if (list.isEmpty) {
+        return MyImageFile(path: movie.coverPath);
+      }
+      // return MyImageFile(path: movie.coverPath);
+      return CarouselView.weighted(
+        onTap: (value) => _showImage(
+          MovieContentCoverSerices.getImagePath(movie.id, list[value]),
+        ),
+        // itemExtent: 200,
+        flexWeights: [2, 1],
+        children: list
+            .map((name) => MyImageFile(
+                  path: MovieContentCoverSerices.getImagePath(movie.id, name),
+                  // fit: BoxFit.fill,
+                ))
+            .toList(),
+      );
+    }
+    if (movie.type == MovieTypes.series.name) {
+      return SeriesVideoPlayer();
+    }
+    return PlayerMobilePage();
   }
-
-  // Widget _getCurrentPlayer() {
-  //   final movie = currentMovieNotifier.value;
-  //   if (movie == null) return const SizedBox.shrink();
-  //   if (isShowCover) {
-  //     return MyImageFile(path: movie.coverPath);
-  //   }
-  //   return PlayerMobilePage();
-  // }
 
   Widget _getContent() {
     final movie = context.watch<MovieProvider>().getCurrent;
@@ -123,6 +115,7 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
                 MovieBookmarkButton(movie: movie),
               ],
             ),
+            // Tags
             MovieTagList(
               movie: movie,
               onClicked: (name) {
@@ -175,6 +168,31 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
     return list.where((mv) => mv.type == movie.type).toList();
   }
 
+  Widget _getSeriesContent() {
+    final movie = context.watch<MovieProvider>().getCurrent!;
+    final seriesVideoPlayerProvider =
+        context.watch<SeriesVideoPlayerProvider>();
+
+    if (movie.type == MovieTypes.series.name) {
+      return SeasonWrapListView(
+        movie: movie,
+        onLoaded: (epList) {
+          seriesVideoPlayerProvider.setMovidId(movie.id);
+          seriesVideoPlayerProvider.setList(epList);
+        },
+        onSeasonChanged: (epList) {
+          seriesVideoPlayerProvider.setList(epList);
+        },
+        onEpisodeClicked: (index, episode) {
+          seriesVideoPlayerProvider.setCurrentIndex(index);
+          isShowCover = false;
+          setState(() {});
+        },
+      );
+    }
+    return SizedBox.shrink();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
@@ -207,9 +225,14 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
                 // flexibleSpace: _getCurrentPlayer(),
                 flexibleSpace: _getContentCoverWidget(),
               ),
+
               //content
               SliverToBoxAdapter(
                 child: _getContent(),
+              ),
+              // series list
+              SliverToBoxAdapter(
+                child: _getSeriesContent(),
               ),
               //related
               SliverToBoxAdapter(

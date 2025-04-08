@@ -6,9 +6,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/extensions/string_extension.dart';
+import 'package:movie_collections/app/models/episode_model.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
+import 'package:movie_collections/app/models/season_model.dart';
 import 'package:movie_collections/app/notifiers/app_notifier.dart';
-import 'package:movie_collections/app/notifiers/movie_notifier.dart';
+import 'package:movie_collections/app/services/movie_content_cover_serices.dart';
+import 'package:movie_collections/app/services/movie_season_services.dart';
 import 'package:movie_collections/app/services/movie_services.dart';
 import 'package:movie_collections/app/utils/path_util.dart';
 import 'package:real_path_file_selector/real_path_file_selector.dart';
@@ -277,8 +280,7 @@ class MovieProvider with ChangeNotifier {
       notifyListeners();
 
       _movie = await MovieServices.instance.getMovieFullInfo(movie);
-      currentMovieNotifier.value = _movie;
-      // await Future.delayed(Duration(milliseconds: 1200));
+      initContentCoverList();
 
       _isLoading = false;
       notifyListeners();
@@ -294,6 +296,7 @@ class MovieProvider with ChangeNotifier {
 
       _list.insert(0, movie);
       _box.add(movie);
+      // set current
       _movie = movie;
 
       _isLoading = false;
@@ -364,6 +367,202 @@ class MovieProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       debugPrint('add: ${e.toString()}');
+    }
+  }
+
+  //movie content cover
+  List<String> contentCoverList = [];
+
+  void addContentCover({required List<String> pathList}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await MovieContentCoverSerices.instance.add(
+      movieId: getCurrent!.id,
+      pathList: pathList,
+    );
+    initContentCoverList();
+  }
+
+  void initContentCoverList() async {
+    _isLoading = true;
+    notifyListeners();
+
+    contentCoverList =
+        await MovieContentCoverSerices.instance.getList(getCurrent!.id);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  //movie season list
+  List<SeasonModel> seasonList = [];
+  void intSeasonList() async {
+    _isLoading = true;
+    notifyListeners();
+
+    seasonList = await MovieSeasonServices.instance.getList(getCurrent!.id);
+    // sort
+    seasonList.sort((a, b) => a.seasonNumber.compareTo(b.seasonNumber));
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void addSeason({required int seasonNumber, String title = 'Untitled'}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final season = SeasonModel.create(
+      movieId: getCurrent!.id,
+      title: title,
+      seasonNumber: seasonNumber,
+    );
+
+    seasonList.add(season);
+
+    await MovieSeasonServices.instance
+        .setList(getCurrent!.id, list: seasonList);
+    intSeasonList();
+  }
+
+  void setSeasonList(
+      {required int seasonNumber, required List<SeasonModel> list}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await MovieSeasonServices.instance.setList(getCurrent!.id, list: list);
+    intSeasonList();
+  }
+
+  //episode
+  void addEpisodesPathList({
+    required String seasonId,
+    required String infoType,
+    required List<String> pathList,
+  }) async {
+    try {
+      final seasonIndex = seasonList.indexWhere((se) => se.id == seasonId);
+      final season = seasonList[seasonIndex];
+      _isLoading = true;
+      notifyListeners();
+
+      int epLatestNumber =
+          season.episodes.isEmpty ? 0 : season.episodes.last.episodeNumber;
+      for (var path in pathList) {
+        final ep = EpisodeModel.createFilePath(
+          path,
+          seasonId: seasonId,
+          episodeNumber: epLatestNumber + 1,
+          infoType: infoType,
+        );
+        //add
+        if (ep.infoType == MovieInfoTypes.data.name) {
+          //real data file
+          final file = File(ep.path);
+          if (await file.exists()) {
+            //copy
+            final newPath =
+                MovieSeasonServices.getVideoPath(getCurrent!.id, ep);
+            await file.rename(newPath);
+          }
+        }
+
+        season.episodes.add(ep);
+        epLatestNumber++;
+      }
+
+      //set resset ui
+      seasonList[seasonIndex] = season;
+
+      await MovieSeasonServices.instance
+          .setList(getCurrent!.id, list: seasonList);
+      intSeasonList();
+    } catch (e) {
+      debugPrint(e.toString());
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void deleteEpisode(SeasonModel season, EpisodeModel episode) async {
+    try {
+      final videoPath =
+          MovieSeasonServices.getVideoPath(getCurrent!.id, episode);
+      final videoFile = File(videoPath);
+      if (await videoFile.exists()) {
+        await videoFile.delete();
+      }
+
+      final index = seasonList.indexWhere((se) => se.id == season.id);
+      final epList =
+          season.episodes.where((ep) => ep.id != episode.id).toList();
+      //sort
+      epList.sort((a, b) => a.episodeNumber.compareTo(b.episodeNumber));
+
+      seasonList[index].episodes = epList;
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void restoreEpisode(SeasonModel season, EpisodeModel episode) async {
+    try {
+      //
+      final videoPath =
+          MovieSeasonServices.getVideoPath(getCurrent!.id, episode);
+      final videoFile = File(videoPath);
+      if (await videoFile.exists()) {
+        final newPath =
+            '${PathUtil.instance.getOutPath()}/${episode.title}.${episode.ext}';
+        await videoFile.rename(newPath);
+      }
+
+      final index = seasonList.indexWhere((se) => se.id == season.id);
+      final epList =
+          season.episodes.where((ep) => ep.id != episode.id).toList();
+      seasonList[index].episodes = epList;
+
+      //sort
+      epList.sort((a, b) => a.episodeNumber.compareTo(b.episodeNumber));
+
+      await MovieSeasonServices.instance
+          .setList(getCurrent!.id, list: seasonList);
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void updateEpisode(SeasonModel season, EpisodeModel episode) async {
+    try {
+      final index = seasonList.indexWhere((se) => se.id == season.id);
+      final epList = season.episodes.map((ep) {
+        if (ep.id == episode.id) {
+          return episode;
+        }
+        return ep;
+      }).toList();
+
+      //sort
+      epList.sort((a, b) => a.episodeNumber.compareTo(b.episodeNumber));
+
+      seasonList[index].episodes = epList;
+
+      await MovieSeasonServices.instance
+          .setList(getCurrent!.id, list: seasonList);
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }

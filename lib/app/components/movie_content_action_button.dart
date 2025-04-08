@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/components/tag_list_tile_button.dart';
 import 'package:movie_collections/app/dialogs/core/index.dart';
 import 'package:movie_collections/app/enums/index.dart';
@@ -10,6 +9,7 @@ import 'package:movie_collections/app/extensions/double_extension.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/screens/index.dart';
+import 'package:movie_collections/app/screens/movie_series_form_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:than_pkg/than_pkg.dart';
 
@@ -43,7 +43,12 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
   void _goEdit() {
     final movie = context.read<MovieProvider>().getCurrent!;
     if (movie.type == MovieTypes.series.name) {
-      showMessage(context, 'မလုပ်ရသေးပါ');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MovieSeriesFormScreen(),
+        ),
+      );
       return;
     }
     //
