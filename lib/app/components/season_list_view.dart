@@ -6,6 +6,7 @@ import 'package:movie_collections/app/models/season_model.dart';
 
 class SeasonListView extends StatelessWidget {
   List<SeasonModel> list;
+  void Function(SeasonModel season)? onMenuOpened;
   void Function(SeasonModel season)? onAddClicked;
   void Function(EpisodeModel episode) onEpisodeClicked;
   void Function(SeasonModel season, EpisodeModel episode)?
@@ -16,6 +17,7 @@ class SeasonListView extends StatelessWidget {
   SeasonListView({
     super.key,
     required this.list,
+    this.onMenuOpened,
     required this.onEpisodeClicked,
     this.onAddClicked,
     this.onEpisodeDeleteClicked,
@@ -30,8 +32,20 @@ class SeasonListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final season = list[index];
         return ExpansionTile(
-          title: Text(
-              'Season: ${season.seasonNumber.toString()} Episodes: ${season.episodes.length}'),
+          title: GestureDetector(
+            onLongPress: () {
+              if (onMenuOpened != null) {
+                onMenuOpened!(season);
+              }
+            },
+            onSecondaryTap: () {
+              if (onMenuOpened != null) {
+                onMenuOpened!(season);
+              }
+            },
+            child: Text(
+                'Season: ${season.seasonNumber.toString()} Episodes: ${season.episodes.length}'),
+          ),
           children: [
             ...List.generate(season.episodes.length, (index) {
               final ep = season.episodes[index];

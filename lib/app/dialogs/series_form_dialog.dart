@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/components/movie_info_type_chooser.dart';
 import 'package:movie_collections/app/components/tag_list_chooser.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/extensions/index.dart';
@@ -20,7 +19,6 @@ class _SeriesFormDialogState extends State<SeriesFormDialog> {
   final TextEditingController titleController = TextEditingController();
   String tags = '';
   String type = MovieTypes.series.name;
-  MovieInfoTypes infoType = MovieInfoTypes.info;
   String? errorText;
 
   @override
@@ -49,7 +47,7 @@ class _SeriesFormDialogState extends State<SeriesFormDialog> {
       title: titleController.text,
       path: '',
       type: type,
-      infoType: infoType.name,
+      infoType: MovieInfoTypes.info.name,
       size: 0,
     );
     await context.read<MovieProvider>().add(movie: movie);
@@ -100,20 +98,6 @@ class _SeriesFormDialogState extends State<SeriesFormDialog> {
             ),
             // type
             Text('Type: ${type.toCaptalize()}'),
-            Row(
-              spacing: 5,
-              children: [
-                Text('Movie Info Type'),
-                MovieInfoTypeChooser(
-                  type: infoType,
-                  onChoosed: (type) {
-                    setState(() {
-                      infoType = type;
-                    });
-                  },
-                ),
-              ],
-            ),
             // tags
             Text('Tags'),
             TagListChooser(

@@ -110,6 +110,7 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              // add series
               ListTile(
                 leading: Icon(Icons.add),
                 title: Text('New Series'),
@@ -121,7 +122,7 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
               //add from path
               ListTile(
                 leading: Icon(Icons.add),
-                title: Text('Add From Path'),
+                title: Text('Add Movie From Path'),
                 onTap: () {
                   Navigator.pop(context);
                   _fromPath();
@@ -130,7 +131,7 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
               //add from path selector
               ListTile(
                 leading: Icon(Icons.add),
-                title: Text('Add From Path Selector'),
+                title: Text('Add Movie Path Selector'),
                 onTap: () {
                   Navigator.pop(context);
                   _pathSelector();
@@ -139,7 +140,7 @@ class _MovieAddActionButtonState extends State<MovieAddActionButton> {
               //movie table
               ListTile(
                 leading: Icon(Icons.table_rows_rounded),
-                title: Text('Movie List'),
+                title: Text('Movie Table List'),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(

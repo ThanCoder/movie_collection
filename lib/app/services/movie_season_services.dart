@@ -32,9 +32,9 @@ class MovieSeasonServices {
     await dbFile.writeAsString(data);
   }
 
-  static String getVideoPath(String movieId, EpisodeModel episode) {
+  static String getVideoPath(EpisodeModel episode) {
     if (episode.infoType == MovieInfoTypes.data.name) {
-      return '${PathUtil.instance.getDatabaseSourcePath()}/$movieId/${episode.id}';
+      return '${PathUtil.instance.getDatabaseSourcePath()}/${episode.movieId}/${episode.id}';
     }
     return episode.path;
   }

@@ -57,14 +57,16 @@ class MovieGridItem extends StatelessWidget {
               ),
             ),
             // info
-            Positioned(
-              child: Icon(
-                size: 20,
-                movie.infoType == MovieInfoTypes.info.name
-                    ? Icons.info_rounded
-                    : Icons.video_file,
-              ),
-            ),
+            movie.type == MovieTypes.series.name
+                ? SizedBox.shrink()
+                : Positioned(
+                    child: Icon(
+                      size: 20,
+                      movie.infoType == MovieInfoTypes.info.name
+                          ? Icons.info_rounded
+                          : Icons.video_file,
+                    ),
+                  ),
           ],
         ),
       ),

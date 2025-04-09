@@ -7,7 +7,9 @@ import 'package:movie_collections/app/dialogs/episode_add_form_dialog.dart';
 import 'package:movie_collections/app/dialogs/episode_edit_form_dialog.dart';
 import 'package:movie_collections/app/dialogs/index.dart';
 import 'package:movie_collections/app/lib_components/path_chooser.dart';
+import 'package:movie_collections/app/models/season_model.dart';
 import 'package:movie_collections/app/providers/index.dart';
+import 'package:movie_collections/app/providers/series_provider.dart';
 import 'package:movie_collections/app/widgets/index.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +22,8 @@ class MovieSeasonFormPage extends StatefulWidget {
 
 class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
   List<String> choosedPathList = [];
-  String? seasonId;
+  SeasonModel? currentSeason;
+  String? movieId;
 
   @override
   void initState() {
@@ -29,7 +32,10 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
   }
 
   void init() {
-    context.read<MovieProvider>().intSeasonList();
+    final movie = context.read<MovieProvider>().getCurrent;
+    if (movie == null) return;
+    movieId = movie.id;
+    context.read<SeriesProvider>().intSeasonList(movie.id);
   }
 
   void _pickFiles() async {
@@ -51,13 +57,13 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
   }
 
   void _addConfirm() {
-    if (seasonId == null) return;
+    if (currentSeason == null) return;
     showDialog(
       context: context,
       builder: (context) => EpisodeAddFormDialog(
         onSubmited: (movieInfoType) {
-          context.read<MovieProvider>().addEpisodesPathList(
-                seasonId: seasonId!,
+          context.read<SeriesProvider>().addEpisodesPathList(
+                season: currentSeason!,
                 infoType: movieInfoType.name,
                 pathList: choosedPathList,
               );
@@ -68,6 +74,7 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
 
   // add season box
   void _addSeason() {
+    if (movieId == null) return;
     showDialog(
       context: context,
       builder: (context) => RenameDialog(
@@ -78,7 +85,8 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
           if (int.tryParse(text) == null) return;
 
           int seasonNumber = int.parse(text);
-          context.read<MovieProvider>().addSeason(
+          context.read<SeriesProvider>().addSeason(
+                movieId: movieId!,
                 seasonNumber: seasonNumber,
               );
         },
@@ -87,7 +95,7 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
   }
 
   int _getSeasonNumber() {
-    final list = context.read<MovieProvider>().seasonList;
+    final list = context.read<SeriesProvider>().seasonList;
     if (list.isEmpty) return 1;
     final latest = List.of(list)
       ..sort((a, b) => b.seasonNumber.compareTo(a.seasonNumber));
@@ -95,9 +103,44 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
     return latest.first.seasonNumber + 1;
   }
 
+  void _deleteSeasonConfirm(SeasonModel season) {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        contentText: 'Season ${season.seasonNumber} ကိုဖျက်ချင်တာ သေချာပြီလား?',
+        onCancel: () {},
+        onSubmit: () {
+          context.read<SeriesProvider>().deleteSeason(season: season);
+        },
+      ),
+    );
+  }
+
+  void _showSeasonMenu(SeasonModel season) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SingleChildScrollView(
+        child: Column(
+          spacing: 3,
+          children: [
+            Text('Season: ${season.seasonNumber.toString()}'),
+            ListTile(
+              iconColor: Colors.red,
+              title: Text('Delete'),
+              onTap: () {
+                Navigator.pop(context);
+                _deleteSeasonConfirm(season);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<MovieProvider>();
+    final provider = context.watch<SeriesProvider>();
     final isLoading = provider.isLoading;
     final list = provider.seasonList;
     return MyScaffold(
@@ -118,9 +161,10 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
                   ? Text('list empty ')
                   : SeasonListView(
                       list: list,
+                      onMenuOpened: _showSeasonMenu,
                       onEpisodeClicked: (episode) {},
                       onAddClicked: (season) {
-                        seasonId = season.id;
+                        currentSeason = season;
                         _pickFiles();
                       },
                       onEpisodeDeleteClicked: (season, episode) {
@@ -132,7 +176,7 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
                             onCancel: () {},
                             onSubmit: () {
                               context
-                                  .read<MovieProvider>()
+                                  .read<SeriesProvider>()
                                   .deleteEpisode(season, episode);
                             },
                           ),
@@ -147,7 +191,7 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
                             onCancel: () {},
                             onSubmit: () {
                               context
-                                  .read<MovieProvider>()
+                                  .read<SeriesProvider>()
                                   .restoreEpisode(season, episode);
                             },
                           ),
@@ -160,7 +204,7 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
                             episode: episode,
                             onSubmited: (episodeEdited) {
                               context
-                                  .read<MovieProvider>()
+                                  .read<SeriesProvider>()
                                   .updateEpisode(season, episodeEdited);
                             },
                           ),

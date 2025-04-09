@@ -1,11 +1,9 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:movie_collections/app/providers/series_video_player_provider.dart';
-import 'package:movie_collections/app/services/movie_season_services.dart';
 import 'package:provider/provider.dart';
 import 'package:than_pkg/than_pkg.dart';
 
@@ -33,26 +31,15 @@ class _SeriesVideoPlayerState extends State<SeriesVideoPlayer> {
 
   void init() async {
     final provider = context.read<SeriesVideoPlayerProvider>();
-
-    // final medias = provider.list
-    //     .map((ep) =>
-    //         Media(MovieSeasonServices.getVideoPath(provider.movieId, ep)))
-    //     .toList();
-    // await player.open(Playlist(medias), play: true);
     if (provider.list.isEmpty) return;
-    final path = MovieSeasonServices.getVideoPath(
-      provider.movieId,
-      provider.list[provider.currentIndex],
-    );
-    await player.open(Media(path), play: true);
+    await player.open(Media(provider.list.first.getVideoPath()), play: true);
   }
 
   void _providerListener() async {
     final provider = context.read<SeriesVideoPlayerProvider>();
     final episode = provider.currentEpisode;
     if (episode == null) return;
-    final path = MovieSeasonServices.getVideoPath(provider.movieId, episode);
-    await player.open(Media(path), play: true);
+    await player.open(Media(episode.getVideoPath()), play: true);
   }
 
   @override

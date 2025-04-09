@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:movie_collections/app/dialogs/core/confirm_dialog.dart';
 import 'package:movie_collections/app/extensions/datetime_extension.dart';
 import 'package:movie_collections/app/extensions/double_extension.dart';
+import 'package:movie_collections/app/extensions/string_extension.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/widgets/core/index.dart';
@@ -73,10 +74,10 @@ class _MovieListTableScreenState extends State<MovieListTableScreen> {
                 Text(mv.title),
               ),
               DataCell(
-                Text(mv.type),
+                Text(mv.type.toCaptalize()),
               ),
               DataCell(
-                Text(mv.infoType),
+                Text(mv.infoType.toCaptalize()),
               ),
               DataCell(
                 Text(mv.size.toDouble().toFileSizeLabel()),
@@ -86,7 +87,7 @@ class _MovieListTableScreenState extends State<MovieListTableScreen> {
               ),
               DataCell(
                 Text(
-                    DateTime.fromMillisecondsSinceEpoch(mv.date).toParseTime()),
+                    '${DateTime.fromMillisecondsSinceEpoch(mv.date).toParseTime()}\n${DateTime.fromMillisecondsSinceEpoch(mv.date).toTimeAgo()}'),
               ),
             ],
           ),

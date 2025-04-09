@@ -77,21 +77,43 @@ class _CoverComponentsState extends State<CoverComponents> {
           ]),
         ],
       );
-      if (files.isNotEmpty) {
-        final path = files.first.path;
-        final file = File(path);
-        if (widget.coverPath.isNotEmpty) {
-          await file.copy(widget.coverPath);
-          // clear image cache
-          await clearAndRefreshImage();
-        }
+      if (files.isEmpty) return;
+
+      final path = files.first.path;
+      final file = File(path);
+      if (widget.coverPath.isNotEmpty && await file.exists()) {
+        await file.copy(widget.coverPath);
+        // clear image cache
+        await clearAndRefreshImage();
+        await Future.delayed(Duration(seconds: 1));
+
         imagePath = path;
+        setState(() {
+          isLoading = false;
+        });
       }
+    } catch (e) {
+      debugPrint(e.toString());
       setState(() {
         isLoading = false;
       });
-    } catch (e) {
-      debugPrint(e.toString());
+    }
+  }
+
+  void _delete() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    if (widget.coverPath.isNotEmpty) {
+      final file = File(widget.coverPath);
+      if (!await file.exists()) return;
+
+      await file.delete();
+      // clear image cache
+      await clearAndRefreshImage();
+      await Future.delayed(Duration(seconds: 1));
+      if (!mounted) return;
       setState(() {
         isLoading = false;
       });
@@ -120,6 +142,15 @@ class _CoverComponentsState extends State<CoverComponents> {
               leading: const Icon(Icons.add),
               title: const Text('Add From Url'),
             ),
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+                _delete();
+              },
+              iconColor: Colors.red,
+              leading: const Icon(Icons.delete_forever),
+              title: const Text('Delete'),
+            ),
           ],
         ),
       ),
@@ -137,15 +168,17 @@ class _CoverComponentsState extends State<CoverComponents> {
         final mime = lookupMimeType(path);
         if (mime == null || !mime.startsWith('image')) return;
         final file = File(path);
-        if (widget.coverPath.isNotEmpty) {
+        if (widget.coverPath.isNotEmpty && await file.exists()) {
           await file.copy(widget.coverPath);
           // clear image cache
           await clearAndRefreshImage();
+          await Future.delayed(Duration(seconds: 1));
+
+          imagePath = path;
+          setState(() {
+            isLoading = false;
+          });
         }
-        imagePath = path;
-        setState(() {
-          isLoading = false;
-        });
       },
       child: MouseRegion(
         cursor: SystemMouseCursors.click,

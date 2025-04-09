@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'package:movie_collections/app/enums/movie_info_types.dart';
 import 'package:movie_collections/app/extensions/index.dart';
+import 'package:movie_collections/app/utils/index.dart';
 import 'package:uuid/uuid.dart';
 
 class EpisodeModel {
   String id;
   String seasonId;
+  String movieId;
   String title;
   int episodeNumber;
   String path;
@@ -12,9 +15,11 @@ class EpisodeModel {
   String infoType;
   int size;
   int date;
+
   EpisodeModel({
     required this.id,
     required this.seasonId,
+    required this.movieId,
     required this.title,
     required this.episodeNumber,
     required this.path,
@@ -27,6 +32,7 @@ class EpisodeModel {
   factory EpisodeModel.createFilePath(
     String path, {
     required String seasonId,
+    required String movieId,
     String? title,
     required int episodeNumber,
     required String infoType,
@@ -35,6 +41,7 @@ class EpisodeModel {
     return EpisodeModel(
       id: Uuid().v4(),
       seasonId: seasonId,
+      movieId: movieId,
       title: title ?? file.path.getName(withExt: false),
       episodeNumber: episodeNumber,
       path: path,
@@ -49,6 +56,7 @@ class EpisodeModel {
     return EpisodeModel(
       id: map['id'],
       seasonId: map['seasonId'],
+      movieId: map['movieId'] ?? '',
       title: map['title'],
       episodeNumber: map['episodeNumber'],
       path: map['path'],
@@ -62,6 +70,7 @@ class EpisodeModel {
   Map<String, dynamic> toMap() => {
         'id': id,
         'seasonId': seasonId,
+        'movieId': movieId,
         'title': title,
         'episodeNumber': episodeNumber,
         'path': path,
@@ -70,6 +79,13 @@ class EpisodeModel {
         'size': size,
         'date': date,
       };
+
+  String getVideoPath() {
+    if (infoType == MovieInfoTypes.data.name) {
+      return '${PathUtil.instance.getDatabaseSourcePath()}/$movieId/$id';
+    }
+    return path;
+  }
 
   @override
   String toString() {

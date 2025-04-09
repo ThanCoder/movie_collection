@@ -29,7 +29,8 @@ class _MovieContentActionButtonState extends State<MovieContentActionButton> {
       context: context,
       barrierDismissible: false,
       builder: (context) => ConfirmDialog(
-        contentText: '`${movie.title}` ကိုဖျက်ချင်တာ သေချာပြီလား',
+        contentText:
+            "`${movie.title}` ကိုဖျက်ချင်တာ သေချာပြီလား?။\nRestore ပြန်မလုပ်နိုင်ပါ!။",
         submitText: 'Delete',
         onCancel: () {},
         onSubmit: () async {
