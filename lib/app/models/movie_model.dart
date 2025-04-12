@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movie_collections/app/utils/path_util.dart';
 import 'package:uuid/uuid.dart';
@@ -50,8 +52,13 @@ class MovieModel {
     required String infoType,
     required int size,
   }) {
+    final id = Uuid().v4();
+    final dir = Directory('${PathUtil.instance.getDatabaseSourcePath()}/$id');
+    if (!dir.existsSync()) {
+      dir.createSync();
+    }
     return MovieModel(
-      id: Uuid().v4(),
+      id: id,
       title: title,
       path: path,
       type: type,

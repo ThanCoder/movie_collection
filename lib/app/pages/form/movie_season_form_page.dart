@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
@@ -138,6 +140,55 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
     );
   }
 
+  void _pickDirPath() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => RenameDialog(
+        renameLabelText: Text('Path ထည့်ပါ'),
+        renameText: '',
+        onCancel: () {},
+        onSubmit: (text) {
+          final dir = Directory(text);
+          if (!dir.existsSync()) return;
+          for (var file in dir.listSync()) {
+            if (file.statSync().type != FileSystemEntityType.file) continue;
+            final mime = lookupMimeType(file.path) ?? '';
+            if (!mime.startsWith('video')) continue;
+            choosedPathList.add(file.path);
+          }
+          _addConfirm();
+        },
+      ),
+    );
+  }
+
+  void _showAddMenu() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SingleChildScrollView(
+        child: Column(
+          children: [
+            ListTile(
+              title: Text('Add From Path'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickDirPath();
+              },
+            ),
+            ListTile(
+              title: Text('Path Selector'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickFiles();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SeriesProvider>();
@@ -165,7 +216,7 @@ class _MovieSeasonFormPageState extends State<MovieSeasonFormPage> {
                       onEpisodeClicked: (episode) {},
                       onAddClicked: (season) {
                         currentSeason = season;
-                        _pickFiles();
+                        _showAddMenu();
                       },
                       onEpisodeDeleteClicked: (season, episode) {
                         showDialog(

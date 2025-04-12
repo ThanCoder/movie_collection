@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/models/tag_model.dart';
 import 'package:movie_collections/app/services/tag_services.dart';
 import 'package:movie_collections/app/widgets/core/index.dart';
@@ -76,7 +75,7 @@ class _TagFormDialogState extends State<TagFormDialog> {
       list.insert(0, tag);
       await TagServices.instance.add(tag);
       if (!mounted) return;
-      showMessage(context, 'Added');
+      // showMessage(context, 'Added');
       titleController.text = '';
       setState(() {});
     } catch (e) {

@@ -50,6 +50,7 @@ class _SeriesFormDialogState extends State<SeriesFormDialog> {
       infoType: MovieInfoTypes.info.name,
       size: 0,
     );
+    
     await context.read<MovieProvider>().add(movie: movie);
 
     if (!mounted) return;
