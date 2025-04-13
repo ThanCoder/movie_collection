@@ -9,6 +9,7 @@ import 'package:movie_collections/app/customs/movie_search_delegate.dart';
 import 'package:movie_collections/app/dialogs/movie_type_chooser_dialog.dart';
 import 'package:movie_collections/app/enums/index.dart';
 import 'package:movie_collections/app/extensions/index.dart';
+import 'package:movie_collections/app/general_server/index.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/notifiers/movie_notifier.dart';
 import 'package:movie_collections/app/providers/index.dart';
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-              'List Empty... ${PlatformExtension.isDesktop() ? 'File Drop Here...' : ''}'),
+              'List Empty... ${PlatformExtension.isDesktop() ? '\nFile Drop Here...' : ''}'),
           IconButton(
             color: Colors.blue,
             onPressed: () async {
@@ -230,6 +231,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(appTitle),
         actions: [
+          GeneralServerNotiButton(),
           IconButton(
             onPressed: () {
               showSearch(
