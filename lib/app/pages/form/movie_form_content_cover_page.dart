@@ -75,7 +75,8 @@ class _MovieFormContentCoverPageState extends State<MovieFormContentCoverPage> {
                 ? Center(
                     child: Text(PlatformExtension.isDesktop()
                         ? 'Image Drop Here...'
-                        : 'List Empty...'))
+                        : 'List Empty...'),
+                  )
                 : RefreshIndicator(
                     onRefresh: () async {
                       context.read<MovieProvider>().initContentCoverList();

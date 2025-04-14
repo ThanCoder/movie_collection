@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:movie_collections/app/components/drop_filepath_container.dart';
 import 'package:movie_collections/app/components/index.dart';
+import 'package:movie_collections/app/components/movie_see_all_view.dart';
 import 'package:movie_collections/app/customs/movie_search_delegate.dart';
 import 'package:movie_collections/app/dialogs/movie_type_chooser_dialog.dart';
 import 'package:movie_collections/app/enums/index.dart';
@@ -106,6 +107,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _goAllScreen(String title, List<MovieModel> list) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AllMovieScreen(
+          title: title,
+          list: list,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<MovieProvider>();
@@ -128,98 +141,46 @@ class _HomePageState extends State<HomePage> {
           spacing: 10,
           children: [
             //random
-            MovieSeeAllListView(
+            MovieSeeAllView(
               title: 'Random',
               list: randomList,
               onClicked: _goContentScreen,
-              onSeeAllClicked: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AllMovieScreen(
-                      list: randomList,
-                      title: 'Random',
-                    ),
-                  ),
-                );
-              },
+              onSeeAllClicked: _goAllScreen,
             ),
             //latest
-            MovieSeeAllListView(
+            MovieSeeAllView(
               title: 'Latest Movie',
               list: list,
               onClicked: _goContentScreen,
-              onSeeAllClicked: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AllMovieScreen(
-                      list: list,
-                      title: 'Latest Movie',
-                    ),
-                  ),
-                );
-              },
+              onSeeAllClicked: _goAllScreen,
             ),
             //Movie
-            MovieSeeAllListView(
+            MovieSeeAllView(
               title: 'Movie',
               list: movieList,
               onClicked: _goContentScreen,
-              onSeeAllClicked: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AllMovieScreen(title: 'Latest Movie', list: movieList),
-                  ),
-                );
-              },
+              onSeeAllClicked: _goAllScreen,
             ),
             //Movie
-            MovieSeeAllListView(
+            MovieSeeAllView(
               title: 'Series',
               list: seriesList,
               onClicked: _goContentScreen,
-              onSeeAllClicked: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AllMovieScreen(title: 'Latest Movie', list: seriesList),
-                  ),
-                );
-              },
+              onSeeAllClicked: _goAllScreen,
             ),
             //Music
-            MovieSeeAllListView(
+            MovieSeeAllView(
               title: 'Music',
               list: musicList,
               onClicked: _goContentScreen,
-              onSeeAllClicked: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AllMovieScreen(title: 'Latest Music', list: musicList),
-                  ),
-                );
-              },
+              onSeeAllClicked: _goAllScreen,
             ),
             //Porns
-            MovieSeeAllListView(
+            MovieSeeAllView(
               title: 'Porns',
               list: pornList,
               onClicked: _goContentScreen,
-              onSeeAllClicked: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AllMovieScreen(title: 'Latest Porns', list: pornList),
-                  ),
-                );
-              },
+              onSeeAllClicked: _goAllScreen,
             ),
           ],
         ),

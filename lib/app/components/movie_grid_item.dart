@@ -6,10 +6,12 @@ import 'package:movie_collections/app/widgets/core/index.dart';
 class MovieGridItem extends StatelessWidget {
   MovieModel movie;
   void Function(MovieModel movie) onClicked;
+  double fontSize;
   MovieGridItem({
     super.key,
     required this.movie,
     required this.onClicked,
+    this.fontSize = 12,
   });
 
   @override
@@ -51,7 +53,7 @@ class MovieGridItem extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: fontSize,
                   ),
                 ),
               ),

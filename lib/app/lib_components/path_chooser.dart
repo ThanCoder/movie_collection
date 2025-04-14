@@ -36,19 +36,17 @@ Future<List<String>> platformVideoPathChooser(BuildContext context) async {
 Future<List<String>> platformImagePathChooser() async {
   List<String> pathList = [];
 
-  if (Platform.isLinux) {
-    final files = await openFiles(
-      acceptedTypeGroups: [
-        XTypeGroup(
-            mimeTypes: ['image/png', 'image/jpg', 'image/webp', 'image/jpeg']),
-      ],
-    );
+  final files = await openFiles(
+    acceptedTypeGroups: [
+      XTypeGroup(
+          mimeTypes: ['image/png', 'image/jpg', 'image/webp', 'image/jpeg']),
+    ],
+  );
 
-    if (files.isEmpty) return pathList;
-    pathList = files
-        .where((f) => File(f.path).statSync().type == FileSystemEntityType.file)
-        .map((f) => f.path)
-        .toList();
-  }
+  if (files.isEmpty) return pathList;
+  pathList = files
+      .where((f) => File(f.path).statSync().type == FileSystemEntityType.file)
+      .map((f) => f.path)
+      .toList();
   return pathList;
 }

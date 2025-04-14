@@ -1,6 +1,6 @@
 name: movie_collections
 description: "movie စုဆောင်းရတာ ကြိုက်နှစ်သက်တဲ့ သူတွေအတွက်"
-version: 1.0.1
+version: 1.0.2
 publish_to: none
 
 environment:
