@@ -9,7 +9,7 @@ part 'movie_model.g.dart';
 
 @HiveType(typeId: 0)
 class MovieModel {
-  static String get getName => 'movies';
+  static String get dbName => 'movies';
   @HiveField(0)
   String id;
   @HiveField(1)
@@ -70,6 +70,10 @@ class MovieModel {
 
   String getSourcePath() {
     return '${PathUtil.instance.getDatabaseSourcePath()}/$id/$id';
+  }
+
+  static Box<MovieModel> get db {
+    return Hive.box<MovieModel>(dbName);
   }
 
   @override

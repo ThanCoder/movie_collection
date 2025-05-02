@@ -27,7 +27,7 @@ void main() async {
   //adapter
   Hive.registerAdapter(MovieModelAdapter());
   //open box
-  await Hive.openBox<MovieModel>(MovieModel.getName);
+  await Hive.openBox<MovieModel>(MovieModel.dbName);
 
   await GeneralServices.instance.init();
 

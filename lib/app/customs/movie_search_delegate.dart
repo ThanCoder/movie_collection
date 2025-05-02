@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/models/index.dart';
-import 'package:movie_collections/app/providers/movie_provider.dart';
 
 class MovieSearchDelegate extends SearchDelegate {
   late List<MovieModel> list;
@@ -9,7 +8,7 @@ class MovieSearchDelegate extends SearchDelegate {
   MovieSearchDelegate({
     required this.onClicked,
   }) {
-    list = MovieProvider.getDB.values.toList();
+    list = MovieModel.db.values.toList();
   }
   @override
   List<Widget>? buildActions(BuildContext context) {

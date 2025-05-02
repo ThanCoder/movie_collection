@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:movie_collections/app/constants.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/models/tag_model.dart';
-import 'package:movie_collections/app/providers/index.dart';
 import 'package:movie_collections/app/utils/path_util.dart';
 
 class TagServices {
@@ -15,7 +14,7 @@ class TagServices {
 
   List<MovieModel> getMovieList(String tagName) {
     List<MovieModel> movieList = [];
-    for (var movie in MovieProvider.getDB.values.toList()) {
+    for (var movie in MovieModel.db.values.toList()) {
       final tags = movie.tags.split(',').toSet();
       if (tags.contains(tagName)) {
         movieList.add(movie);

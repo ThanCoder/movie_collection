@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movie_collections/app/components/index.dart';
+import 'package:movie_collections/app/components/movie_grid_item.dart';
 import 'package:movie_collections/app/models/index.dart';
 
 class MovieSeeAllView extends StatelessWidget {
@@ -30,9 +30,11 @@ class MovieSeeAllView extends StatelessWidget {
   Widget build(BuildContext context) {
     final showList = list.take(showCount).toList();
     if (showList.isEmpty) return const SizedBox.shrink();
-    int _showLines = showLines ?? 1;
-    if (showList.length > 1) {
+    int _showLines = 1;
+    if (showLines == null && showList.length > 1) {
       _showLines = 2;
+    } else {
+      _showLines = showLines ?? 1;
     }
     return Container(
       padding: EdgeInsets.all(padding),

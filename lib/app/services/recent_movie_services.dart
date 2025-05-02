@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:movie_collections/app/constants.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
-import 'package:movie_collections/app/providers/movie_provider.dart';
 import 'package:movie_collections/app/utils/index.dart';
 
 class RecentMovieServices {
@@ -79,7 +78,7 @@ class RecentMovieServices {
   Future<List<MovieModel>> getMovieList() async {
     List<MovieModel> movieList = [];
     final idList = await getList();
-    final list = MovieProvider.getDB.values;
+    final list = MovieModel.db.values;
 
     for (var id in idList) {
       final movie = list.where((mv) => mv.id == id);

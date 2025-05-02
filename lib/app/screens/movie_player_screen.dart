@@ -184,7 +184,10 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
     final list = context.read<MovieProvider>().getList;
     final movie = context.read<MovieProvider>().getCurrent;
     if (movie == null) return [];
-    return list.where((mv) => mv.type == movie.type).toList();
+    final relatedList =
+        List.of(list.where((mv) => mv.type == movie.type).toList());
+    relatedList.shuffle();
+    return relatedList;
   }
 
   Widget _getSeriesContent() {

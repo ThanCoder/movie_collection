@@ -6,8 +6,8 @@ import 'package:movie_collections/app/utils/index.dart';
 Future<void> changeHiveDatabasePath() async {
   try {
     String path = PathUtil.instance.getDatabasePath();
-    if (Hive.isBoxOpen(MovieModel.getName)) {
-      await Hive.box<MovieModel>(MovieModel.getName).close();
+    if (Hive.isBoxOpen(MovieModel.dbName)) {
+      await Hive.box<MovieModel>(MovieModel.dbName).close();
     }
     //close hive
     await Hive.close();
@@ -21,7 +21,7 @@ Future<void> changeHiveDatabasePath() async {
     }
 
     //open box
-    await Hive.openBox<MovieModel>(MovieModel.getName);
+    await Hive.openBox<MovieModel>(MovieModel.dbName);
 
     debugPrint('database path Changed: $path');
   } catch (e) {

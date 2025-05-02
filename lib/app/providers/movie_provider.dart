@@ -24,13 +24,8 @@ class MovieProvider with ChangeNotifier {
 
   List<MovieModel> get getList => _list;
   MovieModel? get getCurrent => _movie;
-  static Box<MovieModel> get getDB => Hive.box<MovieModel>(MovieModel.getName);
 
-  late Box<MovieModel> _box;
-
-  MovieProvider() {
-    _box = Hive.box<MovieModel>(MovieModel.getName);
-  }
+  final Box<MovieModel> _box = MovieModel.db;
 
   Future<List<MovieModel>> initList({bool isReset = false}) async {
     try {

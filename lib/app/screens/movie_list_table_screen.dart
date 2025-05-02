@@ -34,7 +34,7 @@ class _MovieListTableScreenState extends State<MovieListTableScreen> {
     setState(() {
       isLoading = true;
     });
-    list = MovieProvider.getDB.values.toList();
+    list = MovieModel.db.values.toList();
     if (!mounted) return;
     setState(() {
       isLoading = false;

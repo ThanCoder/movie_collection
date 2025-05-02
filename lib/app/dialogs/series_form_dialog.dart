@@ -29,7 +29,7 @@ class _SeriesFormDialogState extends State<SeriesFormDialog> {
   }
 
   void _checkError() {
-    final res = MovieProvider.getDB.values
+    final res = MovieModel.db.values
         .where((mv) => mv.title == titleController.text);
     if (res.isNotEmpty) {
       setState(() {
@@ -85,7 +85,7 @@ class _SeriesFormDialogState extends State<SeriesFormDialog> {
                   return;
                 }
                 final list =
-                    MovieProvider.getDB.values.where((mv) => mv.title == value);
+                    MovieModel.db.values.where((mv) => mv.title == value);
                 if (list.isNotEmpty) {
                   setState(() {
                     errorText = 'title ရှိနေပြီးသား ဖြစ်နေပါတယ်!';

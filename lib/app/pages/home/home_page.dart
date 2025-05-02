@@ -35,8 +35,8 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) => init());
   }
 
-  Future<void> init() async {
-    await context.read<MovieProvider>().initList();
+  Future<void> init({bool isReset = false}) async {
+    await context.read<MovieProvider>().initList(isReset: isReset);
   }
 
   void addMovieFilePath(List<DropItem> items) {
@@ -143,6 +143,7 @@ class _HomePageState extends State<HomePage> {
             //random
             MovieSeeAllView(
               title: 'Random',
+              showLines: 1,
               list: randomList,
               onClicked: _goContentScreen,
               onSeeAllClicked: _goAllScreen,
@@ -207,7 +208,7 @@ class _HomePageState extends State<HomePage> {
           Platform.isLinux
               ? IconButton(
                   onPressed: () async {
-                    await context.read<MovieProvider>().initList(isReset: true);
+                    await init(isReset: true);
                   },
                   icon: Icon(Icons.refresh),
                 )
@@ -222,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                 ? _getRefreshWidget()
                 : RefreshIndicator(
                     onRefresh: () async {
-                      await init();
+                      await init(isReset: true);
                     },
                     child: _getSeeAllWidgets(),
                   ),
