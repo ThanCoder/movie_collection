@@ -10,6 +10,8 @@ part 'movie_model.g.dart';
 @HiveType(typeId: 0)
 class MovieModel {
   static String get dbName => 'movies';
+  static Box<MovieModel> get db => Hive.box<MovieModel>(dbName);
+
   @HiveField(0)
   String id;
   @HiveField(1)
@@ -72,15 +74,13 @@ class MovieModel {
     return '${PathUtil.instance.getDatabaseSourcePath()}/$id/$id';
   }
 
-  static Box<MovieModel> get db {
-    return Hive.box<MovieModel>(dbName);
-  }
+  static List<String> getDataColumnHeaderList() =>
+      ['Title', 'Type', 'Info Type', 'Size', 'Ext', 'Date'];
 
   @override
   String toString() {
     return title;
   }
 
-  static List<String> getDataColumnHeaderList() =>
-      ['Title', 'Type', 'Info Type', 'Size', 'Ext', 'Date'];
+  
 }

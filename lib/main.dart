@@ -38,6 +38,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => SeriesProvider()),
         ChangeNotifierProvider(
             create: (context) => SeriesVideoPlayerProvider()),
+        ChangeNotifierProvider(create: (context) => BookmarkServices()),
       ],
       child: const MyApp(),
     ),

@@ -3,6 +3,7 @@ import 'package:movie_collections/app/components/index.dart';
 import 'package:movie_collections/app/components/tag_list.dart';
 import 'package:movie_collections/app/models/index.dart';
 import 'package:movie_collections/app/providers/index.dart';
+import 'package:movie_collections/app/screens/all_bookmark_movie_screen.dart';
 import 'package:movie_collections/app/screens/index.dart';
 import 'package:movie_collections/app/services/index.dart';
 import 'package:movie_collections/app/widgets/index.dart';
@@ -25,7 +26,8 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   List<MovieModel> recentList = [];
-  List<MovieModel> bookmarkList = [];
+  List<MovieModel> movieList = [];
+
   bool isLoading = true;
 
   void init() async {
@@ -33,9 +35,7 @@ class _LibraryPageState extends State<LibraryPage> {
       setState(() {
         isLoading = true;
       });
-      final list = await context.read<MovieProvider>().initList();
-      final bookmark = await BookmarkServices.instance.getList();
-      bookmarkList = list.where((vd) => bookmark.contains(vd.id)).toList();
+      movieList = await context.read<MovieProvider>().initList();
       recentList = await RecentMovieServices.instance.getMovieList();
 
       setState(() {
@@ -90,17 +90,30 @@ class _LibraryPageState extends State<LibraryPage> {
                     },
                   ),
                   //book mark
-                  MovieSeeAllListView(
-                    title: 'BookMark',
-                    list: bookmarkList,
-                    onClicked: _goContentScreen,
-                    onSeeAllClicked: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AllMovieScreen(
-                              title: 'BookMark', list: bookmarkList),
-                        ),
+                  Consumer<BookmarkServices>(
+                    builder: (context, book, child) {
+                      return FutureBuilder(
+                        future: BookmarkServices.instance.getMovieList(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return TLoader();
+                          }
+                          final list = snapshot.data ?? [];
+                          return MovieSeeAllListView(
+                            title: 'BookMark',
+                            list: list,
+                            onClicked: _goContentScreen,
+                            onSeeAllClicked: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      AllBookmarkMovieScreen(),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       );
                     },
                   ),

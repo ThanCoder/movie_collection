@@ -6,7 +6,7 @@ import 'package:movie_collections/app/constants.dart';
 import 'package:movie_collections/app/models/movie_model.dart';
 import 'package:movie_collections/app/utils/index.dart';
 
-class BookmarkServices {
+class BookmarkServices extends ChangeNotifier {
   static final BookmarkServices instance = BookmarkServices._();
   BookmarkServices._();
   factory BookmarkServices() => instance;
@@ -30,6 +30,7 @@ class BookmarkServices {
       list.insert(0, movieId);
       //save
       await dbFile.writeAsString(jsonEncode(list));
+      notifyListeners();
     } catch (e) {
       debugPrint('add: ${e.toString()}');
     }
@@ -42,6 +43,7 @@ class BookmarkServices {
       list = list.where((id) => id != movieId).toList();
       //save
       await dbFile.writeAsString(jsonEncode(list));
+      notifyListeners();
     } catch (e) {
       debugPrint('add: ${e.toString()}');
     }
