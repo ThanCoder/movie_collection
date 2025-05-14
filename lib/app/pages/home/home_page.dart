@@ -216,7 +216,11 @@ class _HomePageState extends State<HomePage> {
           MovieAddActionButton(),
         ],
       ),
-      body: dropFilepathContainerListenable(
+      body: DropTarget(
+        enable: true,
+        onDragDone: (details) {
+          print(details);
+        },
         child: isLoading
             ? TLoader()
             : list.isEmpty

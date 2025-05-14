@@ -13,6 +13,7 @@ class DropFilepathContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropTarget(
+      enable: false,
       onDragDone: onDroped != null
           ? (details) {
               onDroped!(details.files);
