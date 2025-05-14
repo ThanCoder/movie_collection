@@ -6,12 +6,9 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movie_collections"
+    namespace = "than.mc.v2"
     compileSdk = flutter.compileSdkVersion
-//    ndkVersion = flutter.ndkVersion
-    ndkVersion = "29.0.13113456"
-
-    
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -24,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.movie_collections"
+        applicationId = "than.mc.v2"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

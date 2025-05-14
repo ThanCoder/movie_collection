@@ -5,16 +5,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:label="Movie Collection"
+        android:label="mc_v2"
         android:name="${applicationName}"
-        android:enableOnBackInvokedCallback="true"
-        android:icon="@mipmap/launcher_icon">
-        <provider
-            android:name="than.plugin.than_pkg.TContentProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true" />
-
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

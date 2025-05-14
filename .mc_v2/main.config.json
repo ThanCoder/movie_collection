@@ -1,0 +1,10 @@
+{
+  "is_use_custom_path": false,
+  "custom_path": "/home/thancoder/.mc_v2",
+  "is_dark_theme": true,
+  "proxy_address": "",
+  "proxy_port": "8080",
+  "is_use_proxy_server": false,
+  "forward_proxy_url": "https://express-forward-proxy.vercel.app",
+  "browser_proxy_url": "https://node-browser.vercel.app"
+}
