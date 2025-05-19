@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:t_widgets/t_widgets.dart';
 import 'package:than_pkg/than_pkg.dart';
 
@@ -80,8 +81,8 @@ class _HomePageState extends State<HomePage> {
             SliverToBoxAdapter(
                 child: Center(
               child: appList.isEmpty
-                  ? Text('Version မရှိပါ')
-                  : Text('Latest Version'),
+                  ? const Text('Version မရှိပါ')
+                  : const Text('Latest Version'),
             )),
             SliverToBoxAdapter(
               child: _getHeader(),
@@ -90,8 +91,8 @@ class _HomePageState extends State<HomePage> {
             // current platform
             SliverToBoxAdapter(
               child: appList.isEmpty
-                  ? SizedBox.shrink()
-                  : Center(
+                  ? const SizedBox.shrink()
+                  : const Center(
                       child: Text('Current Platform'),
                     ),
             ),
@@ -105,8 +106,8 @@ class _HomePageState extends State<HomePage> {
             // other platform
             SliverToBoxAdapter(
               child: appList.isEmpty
-                  ? SizedBox.shrink()
-                  : Center(
+                  ? const SizedBox.shrink()
+                  : const Center(
                       child: Text('Other Platform'),
                     ),
             ),
@@ -155,7 +156,7 @@ class ReleaseAppListItem extends StatelessWidget {
                       ? const SizedBox.shrink()
                       : Text('Desc: ${app.description}'),
                   Text('Date: ${DateTime.parse(app.date).toParseTime()}'),
-                  Text('Ago: ${DateTime.parse(app.date).toTimeAgo()}'),
+                  Text('Ago: ${DateTime.parse(app.date).toAutoParseTime()}'),
                   app.url.isEmpty
                       ? const SizedBox.shrink()
                       : IconButton(

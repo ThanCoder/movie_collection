@@ -34,7 +34,7 @@ class ReleasePage extends StatelessWidget {
           );
         }
 
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       },
     );
   }
@@ -64,13 +64,13 @@ class ReleaseListItem extends StatelessWidget {
               Text(release.title),
               // Text(release.packageName),
               release.description.isEmpty
-                  ? SizedBox.shrink()
+                  ? const SizedBox.shrink()
                   : Text(release.description),
               Text('Date: ${DateTime.parse(release.date).toParseTime()}'),
-              Text('Ago: ${DateTime.parse(release.date).toTimeAgo()}'),
+              Text('Ago: ${DateTime.parse(release.date).toAutoParseTime()}'),
               IconButton(
                 onPressed: () => onDownloadClicked(release),
-                icon: Icon(Icons.download),
+                icon: const Icon(Icons.download),
               ),
             ],
           ),
