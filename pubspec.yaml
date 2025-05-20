@@ -39,7 +39,7 @@ dev_dependencies:
 flutter_launcher_icons:
   # commmand dart run flutter_launcher_icons
   android: "launcher_icon"
-  image_path: "assets/logo.webp"
+  image_path: "assets/logo.png"
 
 flutter:
   # The following line ensures that the Material Icons font is

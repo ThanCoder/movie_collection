@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mc_v2/models/episode.dart';
 import 'package:mc_v2/models/info_type.dart';
@@ -23,7 +22,7 @@ void main() async {
   await ThanPkg.instance.init();
 
   await TWidgets.instance.init(
-    defaultImageAssetsPath: 'assets/logo.webp',
+    defaultImageAssetsPath: 'assets/logo.png',
     getDarkMode: () {
       return appConfigNotifier.value.isDarkTheme;
     },

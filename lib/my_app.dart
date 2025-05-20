@@ -10,11 +10,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         valueListenable: appConfigNotifier,
-        builder: (context, value, child) {
+        builder: (context, config, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            darkTheme: ThemeData.dark(),
-            theme: value.isDarkTheme ? ThemeData.dark() : null,
+            darkTheme: ThemeData.dark(useMaterial3: true),
+            themeMode: config.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
             home: HomeScreen(),
           );
         });

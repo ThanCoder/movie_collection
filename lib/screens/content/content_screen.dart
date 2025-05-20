@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:mc_v2/models/video_item.dart';
 import 'package:mc_v2/notifiers/drop_notifier.dart';
+import 'package:mc_v2/route_helper.dart';
 import 'package:mc_v2/screens/content/content_menu_bottom_sheet.dart';
 import 'package:mc_v2/screens/content/header_component.dart';
-import 'package:mc_v2/screens/content/list_item.dart';
+import 'package:mc_v2/screens/content/platforms_media_quary.dart';
 import 'package:mc_v2/screens/content/video_player_component.dart';
+import 'package:mc_v2/screens/content/video_random_sliver_list.dart';
 import 'package:t_widgets/extensions/platform_extension.dart';
 
 class ContentScreen extends StatefulWidget {
@@ -58,9 +60,6 @@ class _ContentScreenState extends State<ContentScreen> {
         body: ValueListenableBuilder(
           valueListenable: VideoItem.db.listenable(),
           builder: (context, db, child) {
-            final randomList = List.of(db.values.toList());
-            randomList.shuffle();
-
             final video = VideoItem.getId(widget.video.id);
             if (video == null) {
               return Text('video မရှိပါ');
@@ -75,8 +74,8 @@ class _ContentScreenState extends State<ContentScreen> {
                     ..._getDesktopAppBar(),
                     SliverAppBar(
                       automaticallyImplyLeading: false,
-                      collapsedHeight: 200,
-                      expandedHeight: 200,
+                      collapsedHeight: PlatformsMediaQuary.getPlayerHeight,
+                      expandedHeight: PlatformsMediaQuary.getPlayerHeight,
                       floating: true,
                       pinned: true,
                       flexibleSpace: VideoPlayerComponent(video: video),
@@ -106,13 +105,10 @@ class _ContentScreenState extends State<ContentScreen> {
                       ),
                     ),
                     // random list
-                    SliverList.builder(
-                      itemCount: randomList.length,
-                      itemBuilder: (context, index) => ListItem(
-                        height: 250,
-                        video: randomList[index],
-                        onClicked: (video) {},
-                      ),
+                    VideoRandomSliverList(
+                      onClicked: (video) {
+                        goContentScreen(context, video);
+                      },
                     ),
                   ],
                 ),

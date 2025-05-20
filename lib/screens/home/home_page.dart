@@ -7,6 +7,7 @@ import 'package:mc_v2/dialogs/add_video_dialog.dart';
 import 'package:mc_v2/models/video_item.dart';
 import 'package:mc_v2/notifiers/drop_notifier.dart';
 import 'package:mc_v2/route_helper.dart';
+import 'package:mc_v2/screens/home/add_action_button.dart';
 import 'package:than_pkg/extensions/platform_extension.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,6 +35,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         appBar: AppBar(
           title: Text(appTitle),
+          actions: [
+            AddActionButton(),
+          ],
         ),
         body: ValueListenableBuilder(
           valueListenable: homeFileDropEnableNotifier,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mc_v2/models/video_item.dart';
+import 'package:mc_v2/screens/content/platforms_media_quary.dart';
 import 'package:mc_v2/screens/content/video_player.dart';
 import 'package:t_widgets/widgets/index.dart';
 
@@ -29,13 +30,13 @@ class _VideoPlayerComponentState extends State<VideoPlayerComponent> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        isShowVideoPlayer = !isShowVideoPlayer;
+        isShowVideoPlayer = true;
         setState(() {});
       },
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: SizedBox(
-          height: 200,
+          height: PlatformsMediaQuary.getPlayerHeight,
           child: isShowVideoPlayer ? _getPlayer() : _header(),
         ),
       ),
