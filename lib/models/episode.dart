@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:hive/hive.dart';
 import 'package:mc_v2/models/info_type.dart';
+import 'package:t_widgets/extensions/string_extension.dart';
+import 'package:uuid/uuid.dart';
 
 part 'episode.g.dart';
 
@@ -37,6 +39,20 @@ class Episode {
     this.infoType = InfoType.info,
   });
 
+  factory Episode.fromPath(
+    String path, {
+    required int episodeNumber,
+    InfoType infoType = InfoType.info,
+  }) {
+    return Episode(
+      id: Uuid().v4(),
+      title: path.getName(),
+      filePath: path,
+      episodeNumber: episodeNumber,
+      infoType: infoType,
+    );
+  }
+
   Future<void> delete() async {
     if (infoType == InfoType.realData) {
       final file = File(filePath);
@@ -44,5 +60,16 @@ class Episode {
         await file.delete();
       }
     }
+  }
+
+  double get getSize {
+    final file = File(filePath);
+    if (!file.existsSync()) return 0;
+    return file.statSync().size.toDouble();
+  }
+
+  @override
+  String toString() {
+    return title;
   }
 }

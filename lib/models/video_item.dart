@@ -16,46 +16,46 @@ class VideoItem {
   static Box<VideoItem> get db => Hive.box<VideoItem>(dbName);
 
   @HiveField(0)
-  final String id;
+  String id;
 
   @HiveField(1)
-  final String title;
+  String title;
 
   @HiveField(2)
-  final VideoType type; // music,movie,series
+  VideoType type; // music,movie,series
 
   @HiveField(3)
-  final String description;
+  String description;
 
   @HiveField(4)
-  final String filePath;
+  String filePath;
 
   @HiveField(5)
-  final String coverPath;
+  String coverPath;
 
   @HiveField(6)
-  final DateTime date;
+  DateTime date;
 
   @HiveField(7)
-  final List<Season> seasons; // for series only
+  List<Season> seasons; // for series only
 
   @HiveField(8)
-  final InfoType infoType; //for real data or info data
+  InfoType infoType; //for real data or info data
 
   @HiveField(9)
-  final List<String> genres; // e.g. Action, Romance
+  List<String> genres; // e.g. Action, Romance
 
   @HiveField(10)
-  final List<String> tags; // e.g. trending, award-winning
+  List<String> tags; // e.g. trending, award-winning
 
   @HiveField(11)
-  final String ext;
+  String ext;
 
   @HiveField(12)
-  final String mime;
+  String mime;
 
   @HiveField(13)
-  final List<String> contentImages;
+  List<String> contentImages;
 
   VideoItem({
     required this.id,
@@ -67,11 +67,11 @@ class VideoItem {
     required this.date,
     required this.ext,
     required this.mime,
+    required this.contentImages,
+    required this.genres,
+    required this.seasons,
+    required this.tags,
     this.description = '',
-    this.seasons = const [],
-    this.genres = const [],
-    this.tags = const [],
-    this.contentImages = const [],
   });
 
   factory VideoItem.fromPath(
@@ -91,6 +91,34 @@ class VideoItem {
       date: DateTime.now(),
       ext: path.getExt(),
       mime: lookupMimeType(path) ?? '',
+      contentImages: [],
+      genres: [],
+      seasons: [],
+      tags: [],
+    );
+  }
+
+  factory VideoItem.createSeries(
+    String title, {
+    VideoType type = VideoType.series,
+    InfoType infoType = InfoType.info,
+  }) {
+    final id = Uuid().v4();
+
+    return VideoItem(
+      id: id,
+      title: title,
+      type: type,
+      infoType: infoType,
+      filePath: '',
+      coverPath: '${PathUtil.getDatabaseSourcePath()}/$id.png',
+      date: DateTime.now(),
+      ext: '',
+      mime: '',
+      contentImages: [],
+      genres: [],
+      seasons: [],
+      tags: [],
     );
   }
 
@@ -121,15 +149,48 @@ class VideoItem {
   }
 
   String get getSizeLable {
+    if (type == VideoType.series) {
+      double size = 0;
+      for (var season in seasons) {
+        size += season.getSize;
+      }
+      return size.toFileSizeLabel();
+    }
+    // is single video
     final file = File(filePath);
     if (!file.existsSync()) return '';
     return file.statSync().size.toDouble().toFileSizeLabel();
   }
 
+  bool get isExists {
+    final file = File(filePath);
+    return file.existsSync();
+  }
+
+  // season
+  void addSeason(Season season) {
+    seasons.add(season);
+  }
+
+  bool isSeasonExists(int number) {
+    final res = seasons.where((e) => e.seasonNumber == number);
+    return res.isNotEmpty;
+  }
+
+  Season? get getLatestSeason {
+    if (seasons.isEmpty) return null;
+    seasons.sort((a, b) => a.seasonNumber.compareTo(b.seasonNumber));
+    return seasons.last;
+  }
+
   //static
-  static Future<void> addMultiple(List<VideoItem> list) async {
+  static Future<void> addMultiple(
+    List<VideoItem> list, {
+    bool isExistsSkip = true,
+  }) async {
     // return await db.addAll(list);
     for (var video in list) {
+      if (isExistsSkip && isExistsTitle(video.title)) continue;
       await db.put(video.id, video);
     }
   }
@@ -140,8 +201,36 @@ class VideoItem {
   }
 
   static VideoItem? getId(String id) {
-    // final index = db.values.toList().indexWhere((e) => e.id == id);
     return db.get(id);
+  }
+
+  static bool isExistsTitle(String title) {
+    final res = db.values.where((e) => e.title == title).toList();
+    return res.isNotEmpty;
+  }
+
+  static List<VideoItem> getList({
+    bool isExistsFile = true,
+  }) {
+    final res = db.values.toList();
+
+    if (isExistsFile) {
+      return res.where((e) {
+        // series
+        if (e.type == VideoType.series) {
+          return true;
+        }
+        return e.isExists;
+      }).toList();
+    }
+    //not exits
+    return res.where((e) {
+      // series
+      if (e.type == VideoType.series) {
+        return false;
+      }
+      return !e.isExists;
+    }).toList();
   }
 
   static List<VideoItem> getLatest() {
@@ -156,5 +245,10 @@ class VideoItem {
       return 0;
     });
     return res;
+  }
+
+  @override
+  String toString() {
+    return title;
   }
 }

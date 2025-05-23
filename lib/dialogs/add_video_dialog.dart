@@ -16,7 +16,7 @@ class AddVideoDialog extends StatelessWidget {
       scrollable: true,
       content: Column(
         children: [
-          Text('add dialog'),
+          Text('Add Movie'),
         ],
       ),
       actions: [

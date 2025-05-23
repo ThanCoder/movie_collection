@@ -8,6 +8,7 @@ import 'package:mc_v2/models/video_item.dart';
 import 'package:mc_v2/notifiers/drop_notifier.dart';
 import 'package:mc_v2/route_helper.dart';
 import 'package:mc_v2/screens/home/add_action_button.dart';
+import 'package:t_widgets/t_widgets.dart';
 import 'package:than_pkg/extensions/platform_extension.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,6 +19,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isLoading = false;
+
+  Future<void> init() async {
+    setState(() {
+      isLoading = true;
+    });
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   void _addPath(List<String> pathList) {
     if (pathList.isEmpty) return;
     List<VideoItem> list = [];
@@ -33,50 +48,63 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(appTitle),
-          actions: [
-            AddActionButton(),
-          ],
-        ),
-        body: ValueListenableBuilder(
-          valueListenable: homeFileDropEnableNotifier,
-          builder: (context, dropEnalbe, child) {
-            return DropTarget(
-              enable: dropEnalbe,
-              onDragDone: (details) {
-                _addPath(details.files.map((e) => e.path).toList());
+      appBar: AppBar(
+        title: Text(appTitle),
+        actions: [
+          PlatformExtension.isDesktop()
+              ? IconButton(
+                  onPressed: init,
+                  icon: Icon(Icons.refresh),
+                )
+              : const SizedBox.shrink(),
+          AddActionButton(),
+        ],
+      ),
+      body: isLoading
+          ? TLoader()
+          : ValueListenableBuilder(
+              valueListenable: homeFileDropEnableNotifier,
+              builder: (context, dropEnalbe, child) {
+                return DropTarget(
+                  enable: dropEnalbe,
+                  onDragDone: (details) {
+                    _addPath(details.files.map((e) => e.path).toList());
+                  },
+                  child: ValueListenableBuilder(
+                    valueListenable: VideoItem.db.listenable(),
+                    builder: (context, db, child) {
+                      final list = VideoItem.getLatest();
+                      if (list.isEmpty) {
+                        return Center(
+                          child: Text(PlatformExtension.isDesktop()
+                              ? 'Drop Here...'
+                              : 'List Empty...'),
+                        );
+                      }
+                      return RefreshIndicator.adaptive(
+                        onRefresh: init,
+                        child: GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            mainAxisExtent: 180,
+                            mainAxisSpacing: 5,
+                            crossAxisSpacing: 5,
+                          ),
+                          itemCount: list.length,
+                          itemBuilder: (context, index) => VideoGridItem(
+                            video: list[index],
+                            onClicked: (video) {
+                              goContentScreen(context, video);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
               },
-              child: ValueListenableBuilder(
-                valueListenable: VideoItem.db.listenable(),
-                builder: (context, db, child) {
-                  final list = VideoItem.getLatest();
-                  if (list.isEmpty) {
-                    return Center(
-                      child: Text(PlatformExtension.isDesktop()
-                          ? 'Drop Here...'
-                          : 'List Empty...'),
-                    );
-                  }
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 200,
-                      mainAxisExtent: 180,
-                      mainAxisSpacing: 5,
-                      crossAxisSpacing: 5,
-                    ),
-                    itemCount: list.length,
-                    itemBuilder: (context, index) => VideoGridItem(
-                      video: list[index],
-                      onClicked: (video) {
-                        goContentScreen(context, video);
-                      },
-                    ),
-                  );
-                },
-              ),
-            );
-          },
-        ));
+            ),
+    );
   }
 }

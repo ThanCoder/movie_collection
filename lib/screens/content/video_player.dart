@@ -1,10 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:mc_v2/models/video_item.dart';
-import 'package:mc_v2/screens/content/my_listener/page_navi_listener.dart';
+import 'package:mc_v2/models/video_type.dart';
+import 'package:mc_v2/screens/content/my_listener/content_screen_event_listener.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:than_pkg/enums/screen_orientation_types.dart';
 import 'package:than_pkg/than_pkg.dart';
 
 class VideoPlayer extends StatefulWidget {
@@ -15,7 +16,8 @@ class VideoPlayer extends StatefulWidget {
   State<VideoPlayer> createState() => _VideoPlayerState();
 }
 
-class _VideoPlayerState extends State<VideoPlayer> with PageNaviListener {
+class _VideoPlayerState extends State<VideoPlayer>
+    with ContentScreenEventListener {
   // Create a [Player] to control playback.
   late final player = Player();
   // Create a [VideoController] to handle video output from [Player].
@@ -25,28 +27,40 @@ class _VideoPlayerState extends State<VideoPlayer> with PageNaviListener {
 
   @override
   void initState() {
-    PageNaviSubject.instance.addListener(this);
+    ContentScreenEventSender.instance.addListener(this);
     super.initState();
-    init();
-    // Play a [Media] or [Playlist].
-    // player.open(Media('https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4'));
+    final video = widget.video;
+    if (video.type == VideoType.series) {
+      if (video.seasons.isNotEmpty && video.seasons.first.episodes.isNotEmpty) {
+        play(video.seasons.first.episodes.first.filePath);
+      }
+    } else {
+      play(video.filePath);
+    }
+  }
+
+  void play(String source) async {
+    await player.open(Media(source), play: true);
+    player.stream.height.listen((vH) {
+      width = player.state.width ?? 0;
+      height = vH ?? 0;
+      setState(() {});
+    });
   }
 
   @override
-  void onPageChanged() {
-    player.pause();
+  void onPageChanged(String? pageName) {
+    player.stop();
   }
 
-  void init() async {
-    await player.open(Media(widget.video.filePath), play: true);
-    width = player.state.width ?? 0;
-    height = player.state.height ?? 0;
-    setState(() {});
+  @override
+  void onPlayVideoPlayer(String source) {
+    play(source);
   }
 
   @override
   void dispose() {
-    PageNaviSubject.instance.removeListener(this);
+    ContentScreenEventSender.instance.removeListener(this);
     player.dispose();
     super.dispose();
   }
@@ -64,17 +78,21 @@ class _VideoPlayerState extends State<VideoPlayer> with PageNaviListener {
             if (height > width) {
               if (Platform.isAndroid) {
                 ThanPkg.android.app.showFullScreen();
+                return;
               }
-              return;
+              // return;
             }
             await defaultEnterNativeFullscreen();
           },
           onExitFullscreen: () async {
             if (height > width) {
               if (Platform.isAndroid) {
-                ThanPkg.android.app.hideFullScreen();
+                await ThanPkg.android.app.hideFullScreen();
+                await ThanPkg.android.app
+                    .requestOrientation(type: ScreenOrientationTypes.Portrait);
+                return;
               }
-              return;
+              // return;
             }
             await defaultExitNativeFullscreen();
           },

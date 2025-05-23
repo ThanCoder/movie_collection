@@ -1,6 +1,8 @@
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:mc_v2/models/video_item.dart';
 import 'package:mc_v2/widgets/t_list_icon.dart';
+import 'package:than_pkg/than_pkg.dart';
 
 class HeaderComponent extends StatelessWidget {
   VideoItem video;
@@ -10,6 +12,7 @@ class HeaderComponent extends StatelessWidget {
     required this.video,
     this.onMenuOpen,
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +35,21 @@ class HeaderComponent extends StatelessWidget {
                       title: Text(video.mime)),
                   TListIcon(
                       icon: Icon(Icons.info_outline_rounded),
-                      title: Text(video.infoType.name)),
+                      title: Text(video.infoType.name.toCaptalize())),
                   TListIcon(
                       icon: Icon(Icons.type_specimen_rounded),
-                      title: Text(video.type.name)),
+                      title: Text(video.type.name.toCaptalize())),
                   TListIcon(
                       icon: Icon(Icons.file_present),
                       title: Text(video.getSizeLable)),
+                  ExpandableText(
+                    video.description,
+                    expandText: 'Read More',
+                    collapseText: 'Lesss',
+                    expandOnTextTap: true,
+                    collapseOnTextTap: true,
+                    maxLines: 3,
+                  ),
                 ],
               ),
             ),

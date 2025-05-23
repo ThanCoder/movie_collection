@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mc_v2/models/video_item.dart';
+import 'package:mc_v2/models/video_type.dart';
 import 'package:t_widgets/widgets/index.dart';
 import 'package:than_pkg/than_pkg.dart';
 import 'package:than_pkg/types/src_dist_type.dart';
@@ -45,6 +46,7 @@ class _VideoGridItemState extends State<VideoGridItem> {
 
   @override
   Widget build(BuildContext context) {
+    final video = widget.video;
     if (isLoading) return TLoader();
     return GestureDetector(
       onTap: () => widget.onClicked(widget.video),
@@ -74,6 +76,25 @@ class _VideoGridItemState extends State<VideoGridItem> {
                 ),
               ),
             ),
+            video.isExists || video.type == VideoType.series
+                ? SizedBox.shrink()
+                : Positioned(
+                    right: 0,
+                    child: Container(
+                      color: const Color.fromARGB(155, 29, 29, 29),
+                      child: Icon(
+                        color: Colors.red,
+                        Icons.error_outline_rounded,
+                      ),
+                    ),
+                  ),
+            Positioned(
+              child: Container(
+                color: const Color.fromARGB(155, 29, 29, 29),
+                child: Icon(
+                    video.type == VideoType.series ? Icons.tv : Icons.movie),
+              ),
+            )
           ],
         ),
       ),

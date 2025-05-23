@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mc_v2/dialogs/add_video_dialog.dart';
 import 'package:mc_v2/models/video_item.dart';
 import 'package:mc_v2/platforms/platform_libs.dart';
+import 'package:mc_v2/route_helper.dart';
 import 'package:t_widgets/t_widgets.dart';
 
 class AddActionButton extends StatefulWidget {
@@ -45,6 +46,29 @@ class _AddActionButtonState extends State<AddActionButton> {
     );
   }
 
+  void _addSeries() {
+    showDialog(
+      context: context,
+      builder: (ctx) => TRenameDialog(
+        text: 'Untitled',
+        onCheckIsError: (text) {
+          final res = VideoItem.isExistsTitle(text);
+          if (res) {
+            return 'ရှိနေပါတယ် - title ပြောင်းပေးပါ!';
+          }
+          return null;
+        },
+        submitText: 'New Series',
+        onSubmit: (title) async {
+          final series = VideoItem.createSeries(title);
+          await series.add();
+          if (!ctx.mounted) return;
+          goFormScreen(ctx, series);
+        },
+      ),
+    );
+  }
+
   void _menu() {
     showModalBottomSheet(
       context: context,
@@ -53,6 +77,14 @@ class _AddActionButtonState extends State<AddActionButton> {
           constraints: BoxConstraints(minHeight: 150),
           child: Column(
             children: [
+              ListTile(
+                leading: Icon(Icons.add),
+                title: Text('Add Series'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _addSeries();
+                },
+              ),
               ListTile(
                 leading: Icon(Icons.add),
                 title: Text('Add Movie Selector'),

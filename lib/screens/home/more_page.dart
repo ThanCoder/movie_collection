@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mc_v2/my_libs/general_server/current_version_component.dart';
 import 'package:mc_v2/my_libs/setting/app_setting_screen.dart';
 import 'package:mc_v2/my_libs/setting/theme_component.dart';
+import 'package:mc_v2/screens/home/delete_action.dart';
 import 'package:t_widgets/widgets/index.dart';
 
 class MorePage extends StatelessWidget {
@@ -22,6 +23,11 @@ class MorePage extends StatelessWidget {
               ThemeComponent(),
               //version
               CurrentVersionComponent(),
+              const Divider(),
+              // delete
+              DeleteAction(),
+
+              const Divider(),
               //setting
               TListTileWithDesc(
                 leading: Icon(Icons.settings),

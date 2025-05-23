@@ -5,7 +5,9 @@ import 'package:mc_v2/notifiers/drop_notifier.dart';
 import 'package:mc_v2/route_helper.dart';
 import 'package:mc_v2/screens/content/content_menu_bottom_sheet.dart';
 import 'package:mc_v2/screens/content/header_component.dart';
+import 'package:mc_v2/screens/content/my_listener/content_screen_event_listener.dart';
 import 'package:mc_v2/screens/content/platforms_media_quary.dart';
+import 'package:mc_v2/screens/content/season_viewer.dart';
 import 'package:mc_v2/screens/content/video_player_component.dart';
 import 'package:mc_v2/screens/content/video_random_sliver_list.dart';
 import 'package:t_widgets/extensions/platform_extension.dart';
@@ -21,7 +23,22 @@ class ContentScreen extends StatefulWidget {
   State<ContentScreen> createState() => _ContentScreenState();
 }
 
-class _ContentScreenState extends State<ContentScreen> {
+class _ContentScreenState extends State<ContentScreen>
+    with ContentScreenEventListener {
+  bool isShowPlayer = false;
+
+  @override
+  void initState() {
+    ContentScreenEventSender.instance.addListener(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    ContentScreenEventSender.instance.removeListener(this);
+    super.dispose();
+  }
+
   void _onBackpress() {
     homeFileDropEnableNotifier.value = true;
   }
@@ -47,6 +64,12 @@ class _ContentScreenState extends State<ContentScreen> {
 
   void _goBack() {
     Navigator.pop(context);
+  }
+
+  @override
+  void onChangedCoverAndPlayer(bool isShowPlayer) {
+    this.isShowPlayer = isShowPlayer;
+    setState(() {});
   }
 
   @override
@@ -83,6 +106,24 @@ class _ContentScreenState extends State<ContentScreen> {
                     // player
 
                     SliverToBoxAdapter(child: SizedBox(height: 10)),
+                    SliverToBoxAdapter(
+                      child: TextButton(
+                        style:
+                            TextButton.styleFrom(backgroundColor: Colors.red),
+                        onPressed: () {
+                          isShowPlayer = !isShowPlayer;
+                          setState(() {});
+                          ContentScreenEventSender.instance
+                              .changeCoverAndPlayer(isShowPlayer);
+                        },
+                        child: Text(
+                          isShowPlayer ? 'Show Cover' : 'Play',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
                     // header
                     SliverToBoxAdapter(
                       child: HeaderComponent(
@@ -99,6 +140,18 @@ class _ContentScreenState extends State<ContentScreen> {
                       ),
                     ),
                     SliverToBoxAdapter(
+                      child: Card(
+                          child: SeasonViewer(
+                        video: video,
+                        onClicked: (episode) {
+                          ContentScreenEventSender.instance
+                              .changeCoverAndPlayer(true);
+                          ContentScreenEventSender.instance
+                              .playVideoPlayer(episode.filePath);
+                        },
+                      )),
+                    ),
+                    SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text('Random'),
@@ -106,6 +159,7 @@ class _ContentScreenState extends State<ContentScreen> {
                     ),
                     // random list
                     VideoRandomSliverList(
+                      currentVideo: video,
                       onClicked: (video) {
                         goContentScreen(context, video);
                       },

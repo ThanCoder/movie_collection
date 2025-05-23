@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 import 'episode.dart';
 
@@ -10,13 +13,13 @@ class Season {
   static Box<Season> get db => Hive.box<Season>(dbName);
 
   @HiveField(0)
-  final String id;
+  String id;
 
   @HiveField(1)
-  final int seasonNumber;
+  int seasonNumber;
 
   @HiveField(2)
-  final List<Episode> episodes;
+  List<Episode> episodes;
 
   Season({
     required this.id,
@@ -24,9 +27,37 @@ class Season {
     required this.episodes,
   });
 
+  factory Season.create(int seasonNumber, {required List<Episode> episodes}) {
+    return Season(
+      id: Uuid().v4(),
+      seasonNumber: seasonNumber,
+      episodes: episodes,
+    );
+  }
+  Future<void> deleteEpisode(Episode ep) async {
+    await ep.delete();
+    episodes =
+        episodes.where((e) => e.episodeNumber != ep.episodeNumber).toList();
+  }
+
   Future<void> delete() async {
     for (var ep in episodes) {
       await ep.delete();
     }
+  }
+
+  double get getSize {
+    double size = 0;
+    for (var ep in episodes) {
+      final file = File(ep.filePath);
+      if (!file.existsSync()) return 0;
+      size += file.statSync().size.toDouble();
+    }
+    return size;
+  }
+
+  @override
+  String toString() {
+    return '$seasonNumber';
   }
 }
