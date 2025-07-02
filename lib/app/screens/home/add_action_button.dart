@@ -5,6 +5,7 @@ import 'package:mc_v2/app/models/video_item.dart';
 import 'package:mc_v2/app/platforms/platform_libs.dart';
 import 'package:mc_v2/app/route_helper.dart';
 import 'package:t_widgets/t_widgets.dart';
+import 'package:than_pkg/utils/index.dart';
 
 class AddActionButton extends StatefulWidget {
   const AddActionButton({super.key});
@@ -26,19 +27,26 @@ class _AddActionButtonState extends State<AddActionButton> {
     );
   }
 
-  void _addFromPath() {
+  Future<void> _addFromPath() async {
+    final copiedText = await AppUtil.instance.pasteText();
+    if (!mounted) return;
+
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => TRenameDialog(
-        text: '',
+        text: copiedText,
+        cancelText: 'Close',
+        submitText: 'Scan',
         onSubmit: (path) async {
           final res = await PlatformLibs.videoDirPathChooser(path);
           if (res.isEmpty) return;
 
           final list = res.map((e) => VideoItem.fromPath(e)).toList();
-          if (!ctx.mounted) return;
+          if (!mounted) return;
+
           showCupertinoDialog(
-            context: ctx,
+            context: context,
             builder: (context) => AddVideoDialog(list: list),
           );
         },

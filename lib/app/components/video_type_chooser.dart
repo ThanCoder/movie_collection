@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mc_v2/app/models/video_type.dart';
+import 'package:than_pkg/than_pkg.dart';
 
 class VideoTypeChooser extends StatefulWidget {
   VideoType? value;
@@ -29,8 +30,8 @@ class _VideoTypeChooserState extends State<VideoTypeChooser> {
       borderRadius: BorderRadius.circular(4),
       value: value,
       items: VideoType.getList
-          .map(
-              (e) => DropdownMenuItem<VideoType>(value: e, child: Text(e.name)))
+          .map((e) => DropdownMenuItem<VideoType>(
+              value: e, child: Text(e.name.toCaptalize())))
           .toList(),
       onChanged: (value) {
         setState(() {

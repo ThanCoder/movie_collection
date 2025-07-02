@@ -40,6 +40,7 @@ void main() async {
 
   MediaKit.ensureInitialized();
 
+  PathUtil.getDatabasePath();
   PathUtil.getDatabaseSourcePath();
 
   runApp(const MyApp());

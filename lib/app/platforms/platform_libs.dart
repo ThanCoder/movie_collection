@@ -60,11 +60,8 @@ class PlatformLibs {
       List<String> list = [];
       void scan(String path) async {
         final dir = Directory(path);
-        if (await dir.exists()) {
+        if (dir.existsSync()) {
           for (var file in dir.listSync()) {
-            if (file.statSync().type == FileSystemEntityType.directory) {
-              scan(file.path);
-            }
             //not file skip
             if (file.statSync().type != FileSystemEntityType.file) continue;
             //check video
@@ -73,6 +70,10 @@ class PlatformLibs {
             if (!mime.startsWith('video')) continue;
             //is video file
             list.add(file.path);
+
+            if (file.statSync().type == FileSystemEntityType.directory) {
+              scan(file.path);
+            }
           }
         }
       }
