@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mc_v2/my_libs/setting/home_list_style.dart';
 import 'package:mc_v2/my_libs/setting/theme_component.dart';
 import 'package:t_widgets/dialogs/index.dart';
 import 'package:t_widgets/widgets/index.dart';
@@ -147,7 +148,24 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
                   )
                 : Container(),
 
-            //
+            //home list style
+            ListTileWithDescWidget(
+              widget1: Text('Home List Style'),
+              widget2: DropdownButton<HomeListStyle>(
+                padding: EdgeInsets.all(4),
+                borderRadius: BorderRadius.circular(4),
+                value: config.homeListStyle,
+                items: HomeListStyle.values
+                    .map((e) => DropdownMenuItem<HomeListStyle>(
+                        value: e, child: Text(e.name.toCaptalize())))
+                    .toList(),
+                onChanged: (value) {
+                  config.homeListStyle = value!;
+                  isChanged = true;
+                  setState(() {});
+                },
+              ),
+            ),
           ],
         ),
         floatingActionButton: isChanged

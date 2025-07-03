@@ -67,6 +67,7 @@ class _VideoGridItemState extends State<VideoGridItem> {
                 ),
                 child: Text(
                   widget.video.title,
+                  maxLines: 2,
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

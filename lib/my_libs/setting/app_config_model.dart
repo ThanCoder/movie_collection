@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:mc_v2/my_libs/setting/home_list_style.dart';
 import 'package:mc_v2/my_libs/setting/path_util.dart';
 
 import 'app_notifier.dart';
@@ -16,6 +17,7 @@ class AppConfigModel {
   bool isUseProxyServer;
   String forwardProxyUrl;
   String browserProxyUrl;
+  HomeListStyle homeListStyle;
 
   AppConfigModel({
     this.isUseCustomPath = false,
@@ -26,12 +28,19 @@ class AppConfigModel {
     this.proxyPort = '8080',
     this.forwardProxyUrl = appForwardProxyHostUrl,
     this.browserProxyUrl = appBrowserProxyHostUrl,
+    required this.homeListStyle,
   });
+
+  factory AppConfigModel.create() {
+    return AppConfigModel(
+      homeListStyle: HomeListStyle.allListStyle,
+    );
+  }
 
   factory AppConfigModel.get() {
     final file = File('${appConfigPathNotifier.value}/$appConfigFileName');
     if (!file.existsSync()) {
-      return AppConfigModel();
+      return AppConfigModel.create();
     }
     return AppConfigModel.fromMap(jsonDecode(file.readAsStringSync()));
   }
@@ -41,11 +50,15 @@ class AppConfigModel {
     final file = File('${appConfigPathNotifier.value}/$appConfigFileName');
     String data = const JsonEncoder.withIndent('  ').convert(toMap);
     file.writeAsStringSync(data);
-    appConfigNotifier.value = AppConfigModel();
+    appConfigNotifier.value = AppConfigModel.create();
     appConfigNotifier.value = this;
   }
 
   factory AppConfigModel.fromMap(Map<String, dynamic> map) {
+    var homeListStyle = HomeListStyle.allListStyle;
+    if (map['homeListStyle'] != null) {
+      homeListStyle = HomeListStyle.getStyle(map['homeListStyle']);
+    }
     return AppConfigModel(
       isUseCustomPath: map['is_use_custom_path'] ?? '',
       customPath: map['custom_path'] ?? '',
@@ -56,6 +69,7 @@ class AppConfigModel {
       isUseProxyServer: map['is_use_proxy_server'] ?? false,
       forwardProxyUrl: map['forward_proxy_url'] ?? appForwardProxyHostUrl,
       browserProxyUrl: map['browser_proxy_url'] ?? appBrowserProxyHostUrl,
+      homeListStyle: homeListStyle,
     );
   }
   Map<String, dynamic> get toMap => {
@@ -67,5 +81,6 @@ class AppConfigModel {
         'is_use_proxy_server': isUseProxyServer,
         'forward_proxy_url': forwardProxyUrl,
         'browser_proxy_url': browserProxyUrl,
+        'homeListStyle': homeListStyle.name,
       };
 }

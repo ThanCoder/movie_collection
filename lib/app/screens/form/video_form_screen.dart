@@ -71,6 +71,7 @@ class _SeriesFormScreenState extends State<VideoFormScreen> {
                         label: Text('Title'),
                         controller: titleController,
                         maxLines: 1,
+                        isSelectedAll: true,
                       ),
                     ],
                   ),

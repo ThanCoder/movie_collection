@@ -25,11 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
         bottomNavigationBar: TabBar(tabs: [
           Tab(
-            text: 'Home',
             icon: Icon(Icons.home),
           ),
           Tab(
-            text: 'More',
             icon: Icon(Icons.grid_view_rounded),
           ),
         ]),
